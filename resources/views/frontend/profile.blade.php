@@ -184,6 +184,7 @@
                 <input type="password" id="loginPassword" placeholder="Password" required>
                 <button type="submit" class="auth-btn">Sign In</button>
             </form>
+            @include('partials.social-login')
             <p class="switch-auth">Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
         </div>
     </div>
@@ -215,6 +216,7 @@
                 <textarea id="signupAddress" placeholder="Address" rows="2"></textarea>
                 <button type="submit" class="auth-btn">Create Account</button>
             </form>
+            @include('partials.social-login')
             <p class="switch-auth">Already have an account? <a href="#" id="showLogin">Sign In</a></p>
         </div>
     </div>
@@ -256,4 +258,5 @@
         }
     </script>
     <script src="{{ asset('profile-auth.js') }}"></script>
+    <script src="{{ asset('js/oauth-social-login.js') }}"></script>
 @endpush

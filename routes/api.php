@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
@@ -15,6 +16,18 @@ use App\Http\Controllers\AdminManagementController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AdminRegisterController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\OAuthController;
+use App\Http\Controllers\AdminPasswordGeneratorController;
+use App\Http\Controllers\OTPController;
+
+// Debug endpoint to inspect request payloads
+Route::post('/debug', function(Request $request) {
+    return response()->json([
+        'all' => $request->all(),
+        'content' => $request->getContent(),
+        'headers' => $request->headers->all(),
+    ]);
+});
 
 // Public banner routes
 Route::get('/banners', [BannerController::class, 'index']);
@@ -23,6 +36,15 @@ Route::get('/banners', [BannerController::class, 'index']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/admin/register', [AdminRegisterController::class, 'register']);
+
+// OAuth routes (public)
+Route::post('/oauth/callback', [OAuthController::class, 'handleGoogleCallback']);
+
+// OTP routes (public)
+Route::post('/otp/generate', [OTPController::class, 'generateOTP']);
+Route::post('/otp/verify', [OTPController::class, 'verifyOTP']);
+Route::post('/otp/resend', [OTPController::class, 'resendOTP']);
+Route::post('/otp/verify-2fa', [OTPController::class, 'verify2FACode']);
 
 // Public product routes
 Route::get('/products', [ProductController::class, 'index']);
@@ -38,6 +60,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    
+    // OAuth account management (authenticated users)
+    Route::post('/oauth/link', [OAuthController::class, 'linkOAuthAccount']);
+    Route::post('/oauth/unlink', [OAuthController::class, 'unlinkOAuthAccount']);
+    Route::get('/oauth/connected-providers', [OAuthController::class, 'getConnectedProviders']);
+    
+    // OTP status (authenticated users)
+    Route::get('/otp/status', [OTPController::class, 'getOTPStatus']);
 
     // Cart routes
     Route::get('/cart', [CartController::class, 'show']);
@@ -88,6 +118,9 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     // Category management
     Route::apiResource('categories', CategoryController::class)->except(['show']);
 
+    // Subscription offers (Marketing)
+    Route::apiResource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class);
+
     // Admin Management (Super Admin only)
     Route::prefix('admins')->group(function () {
         Route::get('/', [AdminManagementController::class, 'index']);
@@ -100,6 +133,14 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
     // Activity Logs
     Route::get('/activity-logs', [AdminManagementController::class, 'activityLogs']);
+    
+    // Admin Password Generator (Super Admin only)
+    Route::prefix('generator')->group(function () {
+        Route::post('/credentials', [AdminPasswordGeneratorController::class, 'generate']);
+        Route::post('/verify-2fa', [AdminPasswordGeneratorController::class, 'verify2FA']);
+        Route::get('/search-admin', [AdminPasswordGeneratorController::class, 'searchAdminId']);
+        Route::get('/export-credentials/{adminId}', [AdminPasswordGeneratorController::class, 'exportCredentials']);
+    });
 
     // Change Own Password
     Route::post('/change-password', [AdminManagementController::class, 'changeOwnPassword']);
@@ -125,6 +166,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/banners', [BannerController::class, 'index']);
     Route::post('/banners', [BannerController::class, 'store']);
     Route::put('/banners/{id}', [BannerController::class, 'update']);
+    Route::put('/banners/{id}/toggle', [BannerController::class, 'toggle']);
     Route::delete('/banners/{id}', [BannerController::class, 'destroy']);
     Route::post('/banners/upload', [BannerController::class, 'upload']);
     Route::post('/banners/delete', [BannerController::class, 'delete']);

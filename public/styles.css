@@ -32,6 +32,11 @@ h1, h2 {
     color: var(--navy-deep);
 }
 
+.hero-text h1 {
+    margin: 12px 0;
+    font-size: 64px;
+}
+
 h3, h4 {
     font-family: 'Playfair Display', serif;
     font-style: italic;
@@ -189,14 +194,30 @@ nav {
 
 /* Hero Section */
 .hero {
-    height: 600px;
+    min-height: 650px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 6rem 4rem 4rem 8rem;
+    padding: 4rem 4rem 3rem 8rem;
     margin-top: 80px;
     position: relative;
     overflow: hidden;
+}
+
+/* Ornamental divider fix - reduce height */
+.ornamental-divider {
+    max-height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 12px 0;
+    overflow: hidden;
+}
+
+.ornamental-divider img {
+    width: 100%;
+    height: auto;
+    max-width: 500px;
 }
 
 .banner-slider {
@@ -306,7 +327,7 @@ nav {
     font-size: 60px;
     font-weight: 500;
     color: var(--cream);
-    margin-bottom: 0;
+    margin: 8px 0;
     letter-spacing: 0.05em;
     line-height: 1.1;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -314,9 +335,11 @@ nav {
 }
 
 .ornamental-divider {
-    margin: -85px 0;
+    margin: 8px 0;
     display: flex;
     justify-content: flex-start;
+    max-height: 35px;
+    overflow: hidden;
 }
 
 .hero p {
@@ -342,6 +365,7 @@ nav {
     transition: all 0.3s ease;
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(184, 150, 76, 0.2);
+    margin-top: 16px !important;
 }
 
 .cta-primary:hover {

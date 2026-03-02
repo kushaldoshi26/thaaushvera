@@ -3,7 +3,7 @@ let isLoggedIn = false;
 let userData = {};
 
 // Check token validity on load
-(function() {
+(function () {
     const token = localStorage.getItem('auth_token');
     if (token) {
         // Verify token is valid by checking user data
@@ -81,7 +81,7 @@ function updateProfileDisplay() {
 // Update UI based on login status
 function updateAuthUI() {
     const authText = document.getElementById('authText');
-    
+
     if (isLoggedIn && userData.name) {
         if (authText) authText.textContent = 'Logout';
     } else {
@@ -128,14 +128,14 @@ editBtn.addEventListener('click', () => {
         loginModal.classList.add('active');
         return;
     }
-    
+
     editName.value = userData.name || '';
     editEmail.value = userData.email || '';
     editPhone.value = userData.phone || '';
     editDob.value = userData.dob || '';
     editGender.value = userData.gender || '';
     editAddress.value = userData.address || '';
-    
+
     profileContent.style.display = 'none';
     editForm.style.display = 'flex';
     editBtn.textContent = 'Editing...';
@@ -153,22 +153,22 @@ cancelEdit.addEventListener('click', () => {
 // Save edited profile
 editForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     userData.name = editName.value;
     userData.email = editEmail.value;
     userData.phone = editPhone.value;
     userData.dob = editDob.value;
     userData.gender = editGender.value;
     userData.address = editAddress.value;
-    
+
     localStorage.setItem('currentUser', JSON.stringify(userData));
     updateProfileDisplay();
-    
+
     profileContent.style.display = 'block';
     editForm.style.display = 'none';
     editBtn.textContent = 'Edit';
     editBtn.disabled = false;
-    
+
     alert('Profile updated successfully!');
 });
 
@@ -211,32 +211,34 @@ loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
+
     try {
         const response = await api.login(email, password);
         localStorage.setItem('auth_token', response.data.token);
         localStorage.setItem('currentUser', JSON.stringify(response.data.user));
-        
+
         userData = response.data.user;
         isLoggedIn = true;
-        
-        if (userData.role === 'admin') {
+
+        // Redirect admins and super_admins to the admin panel
+        if (userData.role === 'admin' || userData.role === 'super_admin') {
             window.location.href = '/admin';
         } else {
             updateAuthUI();
             loginModal.classList.remove('active');
             loginForm.reset();
-            alert('Login successful!');
+            alert('Login successful! Welcome back, ' + (userData.name || '') + '.');
         }
     } catch (error) {
-        alert(error.message || 'Login failed');
+        alert(error.message || 'Login failed. Please check your email and password.');
     }
 });
+
 
 // Handle signup form submission
 signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const firstName = document.getElementById('signupFirstName').value;
     const lastName = document.getElementById('signupLastName').value;
     const email = document.getElementById('signupEmail').value;
@@ -248,7 +250,7 @@ signupForm.addEventListener('submit', async (e) => {
     const city = document.getElementById('signupCity').value;
     const state = document.getElementById('signupState').value;
     const address = document.getElementById('signupAddress').value;
-    
+
     try {
         const response = await api.register({
             name: `${firstName} ${lastName}`,
@@ -263,7 +265,7 @@ signupForm.addEventListener('submit', async (e) => {
             state,
             address
         });
-        
+
         alert('Account created successfully! Please login.');
         signupModal.classList.remove('active');
         loginModal.classList.add('active');

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AiController;
 use App\Http\Controllers\WebController;
 
 // Public Pages
@@ -41,6 +42,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/analytics', [WebController::class, 'adminAnalytics'])->name('analytics');
     Route::get('/login-history', [WebController::class, 'adminLoginHistory'])->name('login-history');
     Route::get('/activity-logs', [WebController::class, 'adminActivityLogs'])->name('activity-logs');
+    Route::get('/credentials-generator', [WebController::class, 'adminCredentialsGenerator'])->name('credentials-generator');
     Route::get('/management', [WebController::class, 'adminManagement'])->name('management');
     Route::get('/register', [WebController::class, 'adminRegister'])->name('register');
+
+    // AI intelligence endpoint
+    Route::get('/ai', [AiController::class, 'showAiPage'])->name('ai');
+    Route::post('/ai-agent', [AiController::class, 'askAi'])->name('ai.agent');
+
+    // Admin login
+    Route::get('/login', [\App\Http\Controllers\AdminController::class, 'showLogin'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\AdminController::class, 'login'])->name('login.post');
 });

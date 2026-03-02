@@ -6,9 +6,56 @@ use App\Models\User;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    /**
+     * Show the admin login page
+     */
+    public function showLogin()
+    {
+        if (Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'super_admin')) {
+            return redirect(url('/admin'));
+        }
+        return view('admin.login');
+    }
+
+    /**
+     * Handle admin login form submission
+     */
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['email' => 'Invalid email or password.'])->withInput();
+        }
+
+        if (!in_array($user->role, ['admin', 'super_admin'])) {
+            return back()->withErrors(['email' => 'You do not have admin access.'])->withInput();
+        }
+
+        if (!$user->is_active) {
+            return back()->withErrors(['email' => 'Your account is deactivated. Contact super admin.'])->withInput();
+        }
+
+        Auth::login($user);
+        $user->update(['last_login_at' => now()]);
+
+        // Also store a Sanctum token in session for JS API calls
+        $token = $user->createToken('admin_session')->plainTextToken;
+        session(['admin_token' => $token]);
+
+        return redirect(url('/admin'));
+    }
+
     public function dashboard()
     {
         $totalOrders = \App\Models\Order::count();

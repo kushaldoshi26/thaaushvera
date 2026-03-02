@@ -97,6 +97,7 @@ class WebController extends Controller
     public function adminAnalytics() { return view('admin.analytics'); }
     public function adminLoginHistory() { return view('admin.login-history'); }
     public function adminActivityLogs() { return view('admin.activity-logs'); }
+    public function adminCredentialsGenerator() { return view('admin.credentials-generator'); }
     public function adminManagement() { return view('admin.management'); }
     public function adminRegister() { return view('admin.register'); }
 }

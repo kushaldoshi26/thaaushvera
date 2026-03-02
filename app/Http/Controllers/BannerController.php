@@ -60,6 +60,28 @@ class BannerController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function toggle($id)
+    {
+        $banner = DB::table('banners')->where('id', $id)->first();
+        
+        if (!$banner) {
+            return response()->json(['success' => false, 'message' => 'Banner not found'], 404);
+        }
+
+        $newStatus = !$banner->is_active;
+        
+        DB::table('banners')->where('id', $id)->update([
+            'is_active' => $newStatus,
+            'updated_at' => now()
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Banner status updated',
+            'is_active' => $newStatus
+        ]);
+    }
+
     public function upload(Request $request)
     {
         $request->validate([

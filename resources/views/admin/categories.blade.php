@@ -2,9 +2,7 @@
 @section('title', 'Categories')
 @section('page-title', 'Categories Management')
 
-@section('header-actions')
-<button onclick="openAddModal()" style="background:#059669;color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:500;">+ Add Category</button>
-@endsection
+
 
 @section('content')
 <div class="admin-card">
@@ -25,6 +23,10 @@
 
 <!-- Add/Edit Category Modal -->
 <div id="categoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+@section('header-actions')
+<button onclick="openAddModal()" style="background:#059669;color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:500;">+ Add Category</button>
+@endsection
+
     <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div class="bg-gray-900 text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
             <h2 class="text-xl font-bold" id="modalTitle">Add Category</h2>
@@ -109,6 +111,23 @@ async function deleteCategory(id) {
         if (res.ok) {
             alert('Category deleted successfully');
             loadCategories();
+
+            // If page was opened with ?open_add=1, open the Add Category modal automatically.
+            document.addEventListener('DOMContentLoaded', function () {
+                try {
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('open_add') === '1') {
+                        if (typeof openAddModal === 'function') {
+                            openAddModal();
+                            const url = new URL(window.location);
+                            url.searchParams.delete('open_add');
+                            window.history.replaceState({}, '', url);
+                        }
+                    }
+                } catch (e) {
+                    // ignore in older browsers
+                }
+            });
         } else {
             const err = await res.json();
             alert('Failed to delete: ' + (err.message || 'Unknown error'));
