@@ -27,6 +27,32 @@ let userData = {};
     }
 })();
 
+// ── Unified Login Intent ────────────────────────────────────────────────────
+// If redirected from /admin/login, auto-open the login modal
+// If already logged in as admin, go straight to /admin
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('intent') === 'admin-login') {
+        if (isLoggedIn && (userData.role === 'admin' || userData.role === 'super_admin')) {
+            // Already logged in as admin — redirect immediately
+            window.location.href = '/admin';
+        } else {
+            // Not logged in — auto-open login modal after DOM ready
+            document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.classList.add('active');
+                    // Show a subtle hint that this is for admin access
+                    const title = modal.querySelector('h2, h3, .modal-title');
+                    if (title) title.textContent = '🔐 Admin Login';
+                }
+            });
+        }
+    }
+})();
+
+
 // DOM Elements
 const authLink = document.getElementById('authLink');
 const authText = document.getElementById('authText');
