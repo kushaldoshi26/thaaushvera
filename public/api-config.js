@@ -1,6 +1,14 @@
-// Declare API_BASE_URL only if not already declared
+// Auto-detect API base URL: production vs local development
 if (typeof API_BASE_URL === 'undefined') {
-    var API_BASE_URL = 'http://localhost:8000/api';
+    var API_BASE_URL = (function () {
+        var host = window.location.hostname;
+        // If running locally use local Laravel server
+        if (host === 'localhost' || host === '127.0.0.1') {
+            return 'http://localhost:8000/api';
+        }
+        // Production backend on Railway (update this URL after deploying backend)
+        return 'https://thaaushvera-backend.up.railway.app/api';
+    })();
 }
 
 var api = {

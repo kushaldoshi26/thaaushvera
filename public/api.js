@@ -1,23 +1,26 @@
-const API_URL = 'http://localhost:8000/api';
+const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:8000/api'
+    : 'https://thaaushvera-backend.up.railway.app/api';
+
 
 async function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    
+
     try {
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok) {
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('isLoggedIn', 'true');
-            
+
             if (data.role === 'admin') {
                 window.location.href = '/admin';
             } else {
@@ -37,16 +40,16 @@ async function handleRegister(e) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const phone = document.getElementById('phone')?.value;
-    
+
     try {
         const response = await fetch(`${API_URL}/register`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({name, email, password, phone})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, phone })
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok) {
             alert('Registration successful! Please login.');
             window.location.href = 'login.html';
