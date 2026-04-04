@@ -1,0 +1,25 @@
+# Render.com redirect rules for AUSHVERA static site
+
+# Page routes
+/about          /about.html         200
+/products       /products.html      200
+/product        /product.html       200
+/cart           /cart.html          200
+/profile        /profile.html       200
+/orders         /orders.html        200
+/wishlist       /wishlist.html      200
+/contact        /contact.html       200
+/philosophy     /philosophy.html    200
+/ritual         /ritual.html        200
+/terms          /terms.html         200
+/checkout       /checkout.html      200
+/payment        /payment.html       200
+/security       /security.html      200
+/addresses      /addresses.html     200
+
+# Admin — served from admin.html (info page on static hosting)
+/admin          /admin.html         200
+/admin/*        /admin.html         200
+
+# Fallback — serve index.html for any unmatched route
+/*              /index.html         200

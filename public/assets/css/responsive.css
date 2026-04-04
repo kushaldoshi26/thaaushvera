@@ -1,0 +1,37 @@
+/* ================================================
+   responsive.css — Supplemental responsive rules
+   Main responsive CSS is in styles.css
+   This file adds overrides for product detail page
+   and any legacy class selectors.
+   ================================================ */
+
+/* Product detail page responsive */
+@media (max-width: 900px) {
+    .product-detail-section { padding-top: 1rem; }
+    .product-detail-grid { gap: 1.5rem; }
+    .product-thumbnails .thumb-btn { width: 60px; height: 60px; }
+}
+
+@media (max-width: 600px) {
+    .product-price-row { gap: 0.6rem; }
+    .detail-price { font-size: 1.4rem; }
+    .trust-row { grid-template-columns: 1fr 1fr; }
+    .reviews-layout { gap: 1.5rem; }
+    .write-review-box { padding: 1rem; }
+}
+
+/* Admin responsive */
+@media (max-width: 768px) {
+    .stats-grid[style] { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 480px) {
+    .stats-grid[style] { grid-template-columns: 1fr !important; }
+    .product-purchase-row .btn { font-size: 0.82rem; padding: 0.65rem 1rem; }
+}
+
+/* Print */
+@media print {
+    .site-nav, .site-footer, .toast, .lightbox { display: none !important; }
+    body { background: white; }
+}
