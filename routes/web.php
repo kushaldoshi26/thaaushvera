@@ -25,6 +25,10 @@ Route::get('/terms', [WebController::class, 'terms'])->name('terms');
 // Profile
 Route::get('/profile', [WebController::class, 'profile'])->name('profile');
 
+// Social Auth
+Route::get('/auth/{provider}', [\App\Http\Controllers\AuthSocialController::class, 'redirectToProvider'])->name('auth.social');
+Route::get('/auth/{provider}/callback', [\App\Http\Controllers\AuthSocialController::class, 'handleProviderCallback']);
+
 // ─── Admin ────────────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
     // Login
