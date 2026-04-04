@@ -3,6 +3,7 @@ services:
     name: thaaushvera
     runtime: docker
     plan: free
+    rootDir: .
     healthCheckPath: /
     envVars:
       - key: APP_NAME
