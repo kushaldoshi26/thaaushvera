@@ -1,6 +1,4 @@
-const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:8000/api'
-    : 'https://thaaushvera-backend.up.railway.app/api';
+const API_URL = '/api';
 
 
 async function handleLogin(e) {

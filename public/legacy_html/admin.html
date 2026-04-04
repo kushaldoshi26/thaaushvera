@@ -126,9 +126,7 @@
 
 <script>
 // Auto-detect backend
-const BACKEND = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:8000'
-  : 'https://thaaushvera-backend.up.railway.app';
+const API_BASE_URL = '/api';
 
 async function doAdminLogin() {
   const email = document.getElementById('adminEmail').value;
