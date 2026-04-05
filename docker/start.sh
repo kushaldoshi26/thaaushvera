@@ -40,8 +40,8 @@ EOF
 echo ".env file created."
 
 # ─── Generate APP_KEY if not set ─────────────────────────────────────────────
-if grep -q "APP_KEY=$" "$ENV_FILE" || grep -q "APP_KEY= $" "$ENV_FILE" || [ -z "$APP_KEY" ]; then
-    echo "Generating APP_KEY..."
+if ! grep -q "APP_KEY=base64:" "$ENV_FILE" || [ -z "$APP_KEY" ]; then
+    echo "Generating or fixing APP_KEY..."
     php artisan key:generate --force
 fi
 
