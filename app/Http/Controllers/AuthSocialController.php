@@ -20,31 +20,49 @@ class AuthSocialController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Exception $e) {
-            return redirect('/profile')->with('error', 'Login failed. Please try again.');
+            \Illuminate\Support\Facades\Log::error('Socialite redirect error (' . $provider . '): ' . $e->getMessage());
+            return redirect('/profile')->with('error', 'Social login failed. Please try again.');
         }
 
-        $user = User::where($provider . '_id', $socialUser->getId())
-            ->orWhere('email', $socialUser->getEmail())
-            ->first();
+        try {
+            $user = User::where('oauth_provider', $provider)
+                ->where('oauth_id', $socialUser->getId())
+                ->orWhere('email', $socialUser->getEmail())
+                ->first();
 
-        if ($user) {
-            $user->update([
-                $provider . '_id' => $socialUser->getId(),
-            ]);
-        } else {
-            $user = User::create([
-                'name' => $socialUser->getName(),
-                'email' => $socialUser->getEmail(),
-                $provider . '_id' => $socialUser->getId(),
-                'password' => bcrypt(Str::random(16)),
-                'role' => 'user',
-                'is_active' => true,
-            ]);
+            if ($user) {
+                $user->update([
+                    'oauth_provider' => $provider,
+                    'oauth_id' => $socialUser->getId(),
+                    'last_login_at' => now(),
+                ]);
+            } else {
+                $user = User::create([
+                    'name' => $socialUser->getName(),
+                    'email' => $socialUser->getEmail(),
+                    'oauth_provider' => $provider,
+                    'oauth_id' => $socialUser->getId(),
+                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+                    'role' => 'user',
+                    'is_active' => true,
+                    'last_login_at' => now(),
+                ]);
+
+                try {
+                    // Initialize cart for the new user (hardened)
+                    $user->cart()->create();
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Cart creation failed for social user ' . $user->id . ': ' . $e->getMessage());
+                }
+            }
+
+            Auth::login($user);
+            return redirect('/profile');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Social callback error: ' . $e->getMessage());
+            return redirect('/profile')->with('error', 'Registration failed during social login: ' . $e->getMessage());
         }
-
-        Auth::login($user);
-
-        return redirect('/profile');
     }
 
     public function handleApiCallback(Request $request)
@@ -52,38 +70,78 @@ class AuthSocialController extends Controller
         $provider = $request->input('provider');
         $token = $request->input('token');
 
+        if (!$provider || !$token) {
+            return response()->json(['success' => false, 'message' => 'Provider and token are required'], 400);
+        }
+
         try {
             $socialUser = Socialite::driver($provider)->userFromToken($token);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Invalid token'], 401);
+            \Illuminate\Support\Facades\Log::error('API Socialite error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Invalid or expired social token'], 401);
         }
 
-        $user = User::where($provider . '_id', $socialUser->getId())
-            ->orWhere('email', $socialUser->getEmail())
-            ->first();
+        try {
+            $user = User::where('oauth_provider', $provider)
+                ->where('oauth_id', $socialUser->getId())
+                ->orWhere('email', $socialUser->getEmail())
+                ->first();
 
-        if ($user) {
-            $user->update([
-                $provider . '_id' => $socialUser->getId(),
+            if ($user) {
+                $user->update([
+                    'oauth_provider' => $provider,
+                    'oauth_id' => $socialUser->getId(),
+                    'last_login_at' => now(),
+                ]);
+            } else {
+                $user = User::create([
+                    'name' => $socialUser->getName(),
+                    'email' => $socialUser->getEmail(),
+                    'oauth_provider' => $provider,
+                    'oauth_id' => $socialUser->getId(),
+                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+                    'role' => 'user',
+                    'is_active' => true,
+                    'last_login_at' => now(),
+                ]);
+
+                try {
+                    // Initialize cart for the new user (hardened)
+                    $user->cart()->create();
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Cart creation failed for social user ' . $user->id . ': ' . $e->getMessage());
+                }
+            }
+
+            $authToken = $user->createToken('social_auth_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Social login successful',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role,
+                        'phone' => $user->phone,
+                        'dob' => $user->dob,
+                        'gender' => $user->gender,
+                        'city' => $user->city,
+                        'state' => $user->state,
+                        'pincode' => $user->pincode,
+                        'address' => $user->address,
+                    ],
+                    'token' => $authToken,
+                ]
             ]);
-        } else {
-            $user = User::create([
-                'name' => $socialUser->getName(),
-                'email' => $socialUser->getEmail(),
-                $provider . '_id' => $socialUser->getId(),
-                'password' => bcrypt(Str::random(16)),
-                'role' => 'user',
-                'is_active' => true,
-            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('API Social callback error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false, 
+                'message' => 'Social authentication failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        Auth::login($user);
-        $token = $user->createToken('social_login')->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-            'user' => $user
-        ]);
     }
 }

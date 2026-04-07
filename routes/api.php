@@ -29,6 +29,68 @@ Route::post('/debug', function(Request $request) {
     ]);
 });
 
+// Health check endpoint with deep schema validation
+Route::get('/health', function() {
+    try {
+        $dbConnected = false;
+        try {
+            \DB::connection()->getPdo();
+            $dbConnected = true;
+        } catch (\Exception $e) {
+            $dbError = $e->getMessage();
+        }
+
+        $tableExists = \Schema::hasTable('users');
+        $requiredColumns = [
+            'name', 'email', 'password', 'role', 
+            'phone', 'dob', 'gender', 'pincode', 
+            'city', 'state', 'address',
+            'oauth_provider', 'oauth_id', 'is_active', 'last_login_at'
+        ];
+        
+        $missingColumns = [];
+        $existingColumns = [];
+        if ($tableExists) {
+            foreach ($requiredColumns as $column) {
+                if (\Schema::hasColumn('users', $column)) {
+                    $existingColumns[] = $column;
+                } else {
+                    $missingColumns[] = $column;
+                }
+            }
+        }
+        
+        $status = ($dbConnected && $tableExists && count($missingColumns) === 0) ? 'healthy' : 'degraded';
+        
+        return response()->json([
+            'status' => $status,
+            'database' => [
+                'connected' => $dbConnected,
+                'error' => $dbError ?? null,
+            ],
+            'table_users' => [
+                'exists' => $tableExists,
+                'schema_status' => count($missingColumns) === 0 ? 'complete' : 'incomplete',
+                'missing_columns' => $missingColumns,
+                'existing_columns' => $existingColumns,
+            ],
+            'environment' => [
+                'app_key_set' => config('app.key') ? true : false,
+                'debug_mode' => config('app.debug'),
+                'url' => config('app.url'),
+            ],
+            'timestamp' => now()->toIso8601String(),
+        ], $status === 'healthy' ? 200 : 500);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'critical_error',
+            'message' => $e->getMessage(),
+            'timestamp' => now()->toIso8601String()
+        ], 500);
+    }
+});
+
 // Public banner routes
 Route::get('/banners', [BannerController::class, 'index']);
 

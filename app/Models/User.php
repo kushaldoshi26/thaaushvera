@@ -32,8 +32,8 @@ class User extends Authenticatable
         'city',
         'state',
         'address',
-        'google_id',
-        'facebook_id',
+        'oauth_provider',
+        'oauth_id',
     ];
 
     /**

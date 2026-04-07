@@ -34,6 +34,7 @@ class OAuthController extends Controller
             // Find or create user
             $user = User::where('oauth_provider', $validated['provider'])
                 ->where('oauth_id', $userInfo['id'])
+                ->orWhere('email', $userInfo['email'])
                 ->first();
 
             if (!$user) {
@@ -44,13 +45,25 @@ class OAuthController extends Controller
                     'password' => Hash::make(Str::random(16)),
                     'oauth_provider' => $validated['provider'],
                     'oauth_id' => $userInfo['id'],
-                    'role' => 'customer',
+                    'role' => 'user',
                     'is_active' => true,
-                    'email_verified_at' => now()
+                    'email_verified_at' => now(),
+                    'last_login_at' => now(),
                 ]);
 
-                // Initialize cart for new user
-                $user->cart()->create();
+                try {
+                    // Initialize cart for new user (hardened)
+                    $user->cart()->create();
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Cart creation failed for OAuth user ' . $user->id . ': ' . $e->getMessage());
+                }
+            } else {
+                // Update existing user OAuth details
+                $user->update([
+                    'oauth_provider' => $validated['provider'],
+                    'oauth_id' => $userInfo['id'],
+                    'last_login_at' => now(),
+                ]);
             }
 
             // Create API token
@@ -65,10 +78,18 @@ class OAuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'phone' => $user->phone,
+                    'dob' => $user->dob,
+                    'gender' => $user->gender,
+                    'city' => $user->city,
+                    'state' => $user->state,
+                    'pincode' => $user->pincode,
+                    'address' => $user->address,
                     'oauth_provider' => $validated['provider']
                 ]
             ]);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('OAuth handle error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'OAuth authentication failed: ' . $e->getMessage()

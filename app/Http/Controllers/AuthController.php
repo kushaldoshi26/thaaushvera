@@ -19,8 +19,9 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
-                'password_confirmation' => 'sometimes|same:password',
+                'password_confirmation' => 'required|same:password',
                 'phone' => 'nullable|string',
+                'dob' => 'nullable|date',
                 'gender' => 'nullable|string',
                 'city' => 'nullable|string',
                 'state' => 'nullable|string',
@@ -33,6 +34,7 @@ class AuthController extends Controller
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'phone' => $validated['phone'] ?? null,
+                'dob' => $validated['dob'] ?? null,
                 'gender' => $validated['gender'] ?? null,
                 'city' => $validated['city'] ?? null,
                 'state' => $validated['state'] ?? null,
@@ -41,8 +43,13 @@ class AuthController extends Controller
                 'role' => 'user',
             ]);
 
-            // Create a cart for the user
-            $user->cart()->create();
+            try {
+                // Initialize cart for new user
+                $user->cart()->create();
+            } catch (\Exception $e) {
+                // Log cart creation failure but don't crash registration
+                \Illuminate\Support\Facades\Log::error('Cart creation failed for user ' . $user->id . ': ' . $e->getMessage());
+            }
 
             // Create token
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -57,8 +64,8 @@ class AuthController extends Controller
                         'email' => $user->email,
                         'role' => $user->role,
                         'phone' => $user->phone,
-                        'gender' => $user->gender,
                         'dob' => $user->dob,
+                        'gender' => $user->gender,
                         'city' => $user->city,
                         'state' => $user->state,
                         'pincode' => $user->pincode,
@@ -71,14 +78,21 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Validation failed: ' . implode(', ', array_map(fn($v) => implode(' ', $v), $e->errors())),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
+            // Provide exact database error if possible
+            $errorMsg = 'Registration failed: ' . $e->getMessage();
+            if (str_contains($e->getMessage(), 'column not found') || str_contains($e->getMessage(), 'no such column')) {
+                $errorMsg .= ' (Database schema mismatch. Please run php artisan migrate.)';
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Registration failed',
-                'error' => $e->getMessage()
+                'message' => $errorMsg,
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTrace() : null
             ], 500);
         }
     }
@@ -97,13 +111,15 @@ class AuthController extends Controller
             $user = User::where('email', $validated['email'])->first();
 
             if (!$user || !Hash::check($validated['password'], $user->password)) {
-                throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
-                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid credentials',
+                    'errors' => ['email' => ['The provided credentials (email or password) are incorrect.']]
+                ], 422);
             }
 
-            // Check if admin is active
-            if ($user->role === 'admin' && !$user->is_active) {
+            // Check if account is active
+            if (($user->role === 'admin' || $user->role === 'super_admin') && !$user->is_active) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Your account has been deactivated. Contact super admin.'
@@ -126,8 +142,8 @@ class AuthController extends Controller
                         'email' => $user->email,
                         'role' => $user->role,
                         'phone' => $user->phone,
-                        'gender' => $user->gender,
                         'dob' => $user->dob,
+                        'gender' => $user->gender,
                         'city' => $user->city,
                         'state' => $user->state,
                         'pincode' => $user->pincode,
@@ -140,14 +156,13 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Validation failed: ' . implode(', ', array_map(fn($v) => implode(' ', $v), $e->errors())),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Login failed',
-                'error' => $e->getMessage()
+                'message' => 'Login failed: ' . $e->getMessage(),
             ], 500);
         }
     }
