@@ -102,5 +102,4 @@ class SocialAuthController extends Controller
             return redirect('/profile')->with('error', 'Facebook login failed. Please try again.');
         }
     }
-}</content>
-<parameter name="filePath">c:\Users\Jolly InfoTech\Downloads\thaaushvera-main (1)\thaaushvera-main\app\Http\Controllers\SocialAuthController.php
+}
