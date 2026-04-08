@@ -91,6 +91,36 @@ Route::get('/health', function() {
     }
 });
 
+// TEMPORARY: Detailed health audit for all tables
+Route::get('/detailed-health', function() {
+    $tables = ['users', 'carts', 'cart_items', 'products', 'categories', 'orders', 'order_items', 'reviews', 'banners', 'coupons'];
+    $report = [];
+    
+    foreach ($tables as $table) {
+        $exists = \Schema::hasTable($table);
+        $report[$table] = [
+            'exists' => $exists,
+            'count' => $exists ? \DB::table($table)->count() : 0,
+        ];
+    }
+    
+    return response()->json($report);
+});
+
+// TEMPORARY: Log viewer to identify 500 errors on Render
+Route::get('/logs', function() {
+    $logPath = storage_path('logs/laravel.log');
+    if (!file_exists($logPath)) {
+        return response()->json(['message' => 'Log file not found at ' . $logPath]);
+    }
+    
+    $logs = shell_exec('tail -n 100 ' . escapeshellarg($logPath));
+    return response()->json([
+        'path' => $logPath,
+        'last_100_lines' => explode("\n", $logs)
+    ]);
+});
+
 // Public banner routes
 Route::get('/banners', [BannerController::class, 'index']);
 

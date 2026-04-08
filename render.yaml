@@ -5,7 +5,11 @@ services:
     plan: free
     rootDir: .
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /up
+    healthCheckPath: /api/health
+    disk:
+      name: thaaushvera-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: APP_NAME
         value: AUSHVERA
@@ -23,10 +27,16 @@ services:
         value: /var/data/database.sqlite
       - key: LOG_CHANNEL
         value: stderr
-      - key: OPENAI_API_KEY
+      # Social Login Placeholders
+      - key: GOOGLE_CLIENT_ID
         sync: false
-      - key: GEMINI_API_KEY
+      - key: GOOGLE_CLIENT_SECRET
         sync: false
+      - key: FACEBOOK_CLIENT_ID
+        sync: false
+      - key: FACEBOOK_CLIENT_SECRET
+        sync: false
+      # Other Config
       - key: SESSION_DRIVER
         value: file
       - key: CACHE_DRIVER
