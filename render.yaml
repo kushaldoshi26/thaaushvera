@@ -27,15 +27,19 @@ services:
         value: /var/data/database.sqlite
       - key: LOG_CHANNEL
         value: stderr
-      # Social Login Placeholders
+      # Social Login Config
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://theaushvera-u0g3.onrender.com/auth/google/callback
       - key: FACEBOOK_CLIENT_ID
         sync: false
       - key: FACEBOOK_CLIENT_SECRET
         sync: false
+      - key: FACEBOOK_REDIRECT_URI
+        value: https://theaushvera-u0g3.onrender.com/auth/facebook/callback
       # Other Config
       - key: SESSION_DRIVER
         value: file
