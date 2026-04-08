@@ -12,6 +12,12 @@ class AuthSocialController extends Controller
 {
     public function redirectToProvider($provider)
     {
+        // Safety check for production configuration
+        if (!config("services.{$provider}.client_id") || !config("services.{$provider}.client_secret")) {
+            \Illuminate\Support\Facades\Log::error("Social login attempted but {$provider} is not configured.");
+            return redirect('/profile')->with('error', ucfirst($provider) . ' login is not configured on the server. Please contact administrator.');
+        }
+
         return Socialite::driver($provider)->redirect();
     }
 
