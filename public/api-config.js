@@ -10,8 +10,9 @@ var api = {
 
     getHeaders(includeAuth = false) {
         const headers = {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'X-Requested-With': 'XMLHttpRequest'
         };
         if (includeAuth) {
             const token = this.getToken();
@@ -22,13 +23,46 @@ var api = {
 
     async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
-        const response = await fetch(url, {
-            ...options,
-            headers: this.getHeaders(options.auth)
-        });
-        const data = await response.json();
-        if (!response.ok) throw data;
-        return data;
+        const headers = this.getHeaders(options.auth);
+        
+        // Ensure body is properly stringified if it's an object
+        let body = options.body;
+        if (body && typeof body === 'object') {
+            body = JSON.stringify(body);
+        }
+        
+        const fetchOptions = {
+            method: options.method || 'GET',
+            headers: headers,
+            ...options
+        };
+        
+        // Remove duplicate body from spread
+        if (body) fetchOptions.body = body;
+        
+        try {
+            const response = await fetch(url, fetchOptions);
+            
+            // Handle non-JSON responses
+            const contentType = response.headers.get('content-type');
+            let data;
+            
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                data = { message: text, success: !response.ok };
+            }
+            
+            if (!response.ok) {
+                console.error('API Error:', response.status, data);
+                throw data;
+            }
+            return data;
+        } catch (error) {
+            console.error('Request failed:', error);
+            throw error;
+        }
     },
 
     // Auth
