@@ -41,3 +41,23 @@ services:
         value: file
       - key: CACHE_DRIVER
         value: file
+      # Razorpay Payment Integration
+      - key: RAZORPAY_KEY
+        sync: false
+      - key: RAZORPAY_SECRET
+        sync: false
+      # Email Configuration (SMTP)
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: ADMIN_EMAIL
+        value: admin@aushvera.com
