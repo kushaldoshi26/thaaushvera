@@ -206,8 +206,34 @@ showLogin.addEventListener('click', (e) => {
     loginModal.classList.add('active');
 });
 
-// Handle login form submission
-loginForm.addEventListener('submit', async (e) => {
+// Handle auth link click (login/logout)
+async function handleAuthClick(event) {
+    event.preventDefault();
+    if (isLoggedIn) {
+        // Logout
+        if (confirm('Are you sure you want to logout?')) {
+            try {
+                await api.logout();
+            } catch (error) {
+                console.error('Logout API error:', error);
+                // Continue with local logout even if API fails
+            }
+            
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('currentUser');
+            userData = {};
+            isLoggedIn = false;
+            updateAuthUI();
+            alert('Logged out successfully!');
+        }
+    } else {
+        // Show login modal
+        loginModal.classList.add('active');
+    }
+}
+
+// Make function globally available
+window.handleAuthClick = handleAuthClick;
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;

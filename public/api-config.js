@@ -25,20 +25,21 @@ var api = {
         const url = `${API_BASE_URL}${endpoint}`;
         const headers = this.getHeaders(options.auth);
         
-        // Ensure body is properly stringified if it's an object
-        let body = options.body;
-        if (body && typeof body === 'object') {
-            body = JSON.stringify(body);
-        }
-        
         const fetchOptions = {
             method: options.method || 'GET',
             headers: headers,
             ...options
         };
         
-        // Remove duplicate body from spread
-        if (body) fetchOptions.body = body;
+        // Don't modify body if it's already a string (JSON.stringify was called)
+        if (options.body && typeof options.body === 'object') {
+            fetchOptions.body = JSON.stringify(options.body);
+        } else if (options.body) {
+            fetchOptions.body = options.body;
+        }
+        
+        try {
+            const response = await fetch(url, fetchOptions);
         
         try {
             const response = await fetch(url, fetchOptions);
@@ -69,14 +70,14 @@ var api = {
     async register(userData) {
         return this.request('/register', {
             method: 'POST',
-            body: JSON.stringify(userData)
+            body: userData
         });
     },
 
     async login(email, password) {
         return this.request('/login', {
             method: 'POST',
-            body: JSON.stringify({ email, password })
+            body: { email, password }
         });
     },
 
