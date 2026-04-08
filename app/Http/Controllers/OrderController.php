@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    protected $orderService;
+
+    public function __construct(\App\Services\OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     /**
      * Get user's orders
      */
@@ -26,6 +33,7 @@ class OrderController extends Controller
                     'id' => $order->id,
                     'total_amount' => $order->total_amount,
                     'status' => $order->status,
+                    'payment_status' => $order->payment_status,
                     'item_count' => $order->items()->count(),
                     'created_at' => $order->created_at,
                     'updated_at' => $order->updated_at,
@@ -48,75 +56,13 @@ class OrderController extends Controller
     }
 
     /**
-     * Simulate payment for an order (updates payment status and order status)
-     */
-    public function pay(Request $request, $orderId)
-    {
-        try {
-            $validated = $request->validate([
-                'method' => 'required|string'
-            ]);
-
-            $user = $request->user();
-            $order = Order::where('user_id', $user->id)->find($orderId);
-
-            if (!$order) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order not found'
-                ], 404);
-            }
-
-            if ($order->payment_status === 'paid') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order already paid'
-                ], 422);
-            }
-
-            // Simulate payment gateway response
-            $transactionId = 'txn_' . bin2hex(random_bytes(6));
-
-            $order->update([
-                'payment_status' => 'paid',
-                'payment_method' => $validated['method'],
-                'transaction_id' => $transactionId,
-                'status' => 'processing'
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Payment successful',
-                'data' => [
-                    'order_id' => $order->id,
-                    'transaction_id' => $transactionId,
-                    'status' => $order->status,
-                ]
-            ], 200);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Payment failed',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * Get specific order with items
      */
     public function show(Request $request, $orderId)
     {
         try {
             $user = $request->user();
-            $order = Order::where('user_id', $user->id)->find($orderId);
+            $order = Order::where('user_id', $user->id)->with('items.product')->find($orderId);
 
             if (!$order) {
                 return response()->json([
@@ -124,8 +70,6 @@ class OrderController extends Controller
                     'message' => 'Order not found'
                 ], 404);
             }
-
-            $orderItems = $order->items()->with('product')->get();
 
             return response()->json([
                 'success' => true,
@@ -133,7 +77,11 @@ class OrderController extends Controller
                     'id' => $order->id,
                     'total_amount' => $order->total_amount,
                     'status' => $order->status,
-                    'items' => $orderItems->map(function ($item) {
+                    'payment_status' => $order->payment_status,
+                    'payment_method' => $order->payment_method,
+                    'transaction_id' => $order->transaction_id,
+                    'razorpay_order_id' => $order->razorpay_order_id,
+                    'items' => $order->items->map(function ($item) {
                         return [
                             'id' => $item->id,
                             'product_id' => $item->product_id,
@@ -162,104 +110,12 @@ class OrderController extends Controller
     }
 
     /**
-     * Checkout cart and create order (atomic transaction)
+     * Checkout cart and create order
      */
     public function checkout(Request $request)
     {
         try {
-            $user = $request->user();
-            $cart = $user->cart;
-
-            // Check if cart is empty
-            $cartItems = $cart->items()->with('product')->get();
-            
-            if ($cartItems->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cart is empty'
-                ], 422);
-            }
-
-            // Use database transaction to ensure atomic operation
-            $order = DB::transaction(function () use ($user, $cart, $cartItems) {
-                // Validate all items and calculate total
-                $totalAmount = 0;
-                $orderItemsData = [];
-
-                foreach ($cartItems as $cartItem) {
-                    $product = $cartItem->product;
-
-                    // Validate product still exists
-                    if (!$product) {
-                        throw new \Exception("Product not found for cart item {$cartItem->id}");
-                    }
-
-                    // Validate stock is still available
-                    if ($product->track_inventory && $product->stock < $cartItem->quantity) {
-                        throw new \Exception(
-                            "Insufficient stock for {$product->name}. " .
-                            "Available: {$product->stock}, Requested: {$cartItem->quantity}"
-                        );
-                    }
-
-                    // Calculate subtotal with price snapshot
-                    $subtotal = $product->price * $cartItem->quantity;
-                    $totalAmount += $subtotal;
-
-                    $orderItemsData[] = [
-                        'product_id' => $product->id,
-                        'quantity' => $cartItem->quantity,
-                        'price' => $product->price, // Snapshot current price
-                    ];
-                }
-
-                // Validate total amount
-                if ($totalAmount <= 0) {
-                    throw new \Exception("Order total amount is invalid");
-                }
-
-                // Create order
-                $order = $user->orders()->create([
-                    'total_amount' => $totalAmount,
-                    'status' => 'pending',
-                ]);
-
-                // Create order items with price snapshot and decrement stock
-                foreach ($orderItemsData as $itemData) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $itemData['product_id'],
-                        'quantity' => $itemData['quantity'],
-                        'price' => $itemData['price'],
-                    ]);
-
-                    // Decrement product stock and log history
-                    $product = Product::lockForUpdate()->find($itemData['product_id']);
-                    if ($product->track_inventory) {
-                        $stockBefore = $product->stock;
-                        $product->decrement('stock', $itemData['quantity']);
-                        
-                        StockHistory::create([
-                            'product_id' => $product->id,
-                            'quantity_change' => -$itemData['quantity'],
-                            'stock_before' => $stockBefore,
-                            'stock_after' => $product->stock,
-                            'type' => 'sale',
-                            'reference_type' => 'order',
-                            'reference_id' => $order->id,
-                            'user_id' => $user->id
-                        ]);
-                    }
-                }
-
-                // Clear cart items after successful order creation
-                $cart->items()->delete();
-
-                return $order;
-            });
-
-            // Fetch order with items for response
-            $orderItems = $order->items()->with('product')->get();
+            $order = $this->orderService->createFromCart($request->user());
 
             return response()->json([
                 'success' => true,
@@ -268,16 +124,6 @@ class OrderController extends Controller
                     'id' => $order->id,
                     'total_amount' => $order->total_amount,
                     'status' => $order->status,
-                    'items' => $orderItems->map(function ($item) {
-                        return [
-                            'id' => $item->id,
-                            'product_id' => $item->product_id,
-                            'product_name' => $item->product->name,
-                            'quantity' => $item->quantity,
-                            'price_at_purchase' => $item->price,
-                            'subtotal' => $item->quantity * $item->price,
-                        ];
-                    }),
                     'created_at' => $order->created_at,
                 ]
             ], 201);
@@ -285,14 +131,13 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Checkout failed: ' . $e->getMessage(),
-                'error' => $e->getMessage()
+                'message' => 'Checkout failed: ' . $e->getMessage()
             ], 422);
         }
     }
 
     /**
-     * Update order status (admin only - used in payment processing)
+     * Update order status (admin only)
      */
     public function updateStatus(Request $request, $orderId)
     {
@@ -302,20 +147,8 @@ class OrderController extends Controller
                 'payment_status' => 'sometimes|in:pending,paid,failed,refunded',
             ]);
 
-            $order = Order::find($orderId);
-
-            if (!$order) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order not found'
-                ], 404);
-            }
-
-            $updateData = ['status' => $validated['status']];
-            if (isset($validated['payment_status'])) {
-                $updateData['payment_status'] = $validated['payment_status'];
-            }
-            $order->update($updateData);
+            $order = Order::findOrFail($orderId);
+            $this->orderService->updateStatus($order, $validated['status'], $validated['payment_status'] ?? null);
 
             return response()->json([
                 'success' => true,
@@ -326,12 +159,6 @@ class OrderController extends Controller
                 ]
             ], 200);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -342,52 +169,13 @@ class OrderController extends Controller
     }
 
     /**
-     * Cancel order (if not yet shipped) and restore stock
+     * Cancel order and restore stock
      */
     public function cancel(Request $request, $orderId)
     {
         try {
-            $user = $request->user();
-            $order = Order::where('user_id', $user->id)->find($orderId);
-
-            if (!$order) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order not found'
-                ], 404);
-            }
-
-            if (in_array($order->status, ['shipped', 'delivered', 'cancelled'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Cannot cancel order with status: {$order->status}"
-                ], 422);
-            }
-
-            DB::transaction(function () use ($order, $user) {
-                // Restore stock for all items
-                foreach ($order->items as $item) {
-                    $product = Product::lockForUpdate()->find($item->product_id);
-                    if ($product->track_inventory) {
-                        $stockBefore = $product->stock;
-                        $product->increment('stock', $item->quantity);
-                        
-                        StockHistory::create([
-                            'product_id' => $product->id,
-                            'quantity_change' => $item->quantity,
-                            'stock_before' => $stockBefore,
-                            'stock_after' => $product->stock,
-                            'type' => 'return',
-                            'reference_type' => 'order',
-                            'reference_id' => $order->id,
-                            'user_id' => $user->id,
-                            'notes' => 'Order cancelled'
-                        ]);
-                    }
-                }
-                
-                $order->update(['status' => 'cancelled']);
-            });
+            $order = Order::where('user_id', $request->user()->id)->findOrFail($orderId);
+            $this->orderService->cancelOrder($order);
 
             return response()->json([
                 'success' => true,
@@ -401,9 +189,25 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to cancel order',
-                'error' => $e->getMessage()
-            ], 500);
+                'message' => 'Failed to cancel order: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+
+    /**
+     * DEPRECATED: Simulated payment (Frontend should use Razorpay)
+     */
+    public function pay(Request $request, $orderId)
+    {
+        // For backwards compatibility or simplified testing
+        try {
+            $order = Order::where('user_id', $request->user()->id)->findOrFail($orderId);
+            $this->orderService->updateStatus($order, 'processing', 'paid');
+            $order->update(['payment_method' => $request->method ?? 'simulated', 'transaction_id' => 'sim_' . uniqid()]);
+            
+            return response()->json(['success' => true, 'message' => 'Simulated payment successful']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
         }
     }
 }

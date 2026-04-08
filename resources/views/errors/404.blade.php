@@ -4,39 +4,51 @@
 @section('description', 'Sorry, the page you are looking for does not exist.')
 
 @section('content')
-<section style="padding: 200px 3rem 100px; background: var(--cream); min-height: 100vh; text-align: center;">
-    <div class="container" style="max-width: 800px; margin: 0 auto;">
-        <div style="margin-bottom: 40px;">
-            <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="width: 100px; height: auto; opacity: 0.3;">
+<section style="padding: 160px 2rem 100px; background: var(--cream); min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+    <!-- Decorative background elements -->
+    <div style="position: absolute; top: 10%; left: 5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(184, 150, 76, 0.05) 0%, transparent 70%); filter: blur(60px); z-index: 0;"></div>
+    <div style="position: absolute; bottom: 10%; right: 5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(11, 28, 45, 0.03) 0%, transparent 70%); filter: blur(80px); z-index: 0;"></div>
+
+    <div class="container" style="max-width: 800px; position: relative; z-index: 1; text-align: center;">
+        <div style="margin-bottom: 3rem; animation: slideDown 1s ease-out;">
+            <h1 style="font-size: clamp(100px, 15vw, 180px); line-height: 1; font-weight: 600; color: var(--gold); margin-bottom: 0; font-family: 'Cinzel', serif; letter-spacing: -5px; opacity: 0.9;">
+                404
+            </h1>
+            <div style="width: 100px; height: 1px; background: var(--gold); margin: 1rem auto; opacity: 0.5;"></div>
         </div>
 
-        <h1 style="font-size: 120px; font-weight: bold; color: var(--gold); margin-bottom: 20px; font-family: 'Cinzel', serif;">404</h1>
-
-        <h2 style="font-size: 36px; color: var(--navy-deep); margin-bottom: 20px; font-family: 'Playfair Display', serif;">
-            Page Not Found
+        <h2 style="font-size: 2.5rem; color: var(--navy-deep); margin-bottom: 1.5rem; font-family: 'Playfair Display', serif; font-weight: 500;">
+            Lost in the Essence
         </h2>
 
-        <p style="font-size: 18px; color: var(--charcoal); margin-bottom: 40px; line-height: 1.6;">
-            Sorry, the page you're looking for doesn't exist or has been moved.
+        <p style="font-size: 1.15rem; color: var(--charcoal); margin-bottom: 3.5rem; line-height: 1.8; max-width: 500px; margin-left: auto; margin-right: auto; font-family: 'Inter', sans-serif; opacity: 0.8;">
+            The path you followed seems to have vanished. Let us guide you back to the purity of Aushvera.
         </p>
 
-        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-            <a href="{{ route('home') }}" class="cta-primary" style="padding: 15px 30px; background: var(--gold); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: background 0.3s;">
-                Go Home
+        <div style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; animation: fadeIn 1.5s ease;">
+            <a href="{{ route('home') }}" class="cta-primary" style="padding: 18px 45px; min-width: 200px; display: inline-block;">
+                Return Home
             </a>
 
-            <a href="{{ route('products') }}" class="cta-secondary" style="padding: 15px 30px; background: transparent; color: var(--navy-deep); text-decoration: none; border: 2px solid var(--navy-deep); border-radius: 8px; font-weight: bold; transition: all 0.3s;">
-                Browse Products
-            </a>
-
-            <a href="{{ route('contact') }}" class="cta-secondary" style="padding: 15px 30px; background: transparent; color: var(--navy-deep); text-decoration: none; border: 2px solid var(--navy-deep); border-radius: 8px; font-weight: bold; transition: all 0.3s;">
-                Contact Us
+            <a href="{{ route('products') }}" class="cta-secondary" style="padding: 16px 45px; min-width: 200px; display: inline-block;">
+                Discover Collections
             </a>
         </div>
 
-        <div style="margin-top: 60px;">
-            <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="width: 100px; height: auto; opacity: 0.3; transform: scaleY(-1);">
+        <div style="margin-top: 5rem;">
+            <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="width: 80px; height: auto; opacity: 0.2; filter: grayscale(1);">
         </div>
     </div>
 </section>
+
+<style>
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
 @endsection
