@@ -16,7 +16,7 @@ use App\Http\Controllers\AdminManagementController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AdminRegisterController;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\AuthSocialController;
+use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\AdminPasswordGeneratorController;
 use App\Http\Controllers\OTPController;
 
@@ -130,7 +130,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/admin/register', [AdminRegisterController::class, 'register']);
 
 // OAuth routes (public)
-Route::post('/oauth/callback', [AuthSocialController::class, 'handleApiCallback']);
+Route::post('/oauth/callback', [OAuthController::class, 'handleGoogleCallback']);
 
 // OTP routes (public)
 Route::post('/otp/generate', [OTPController::class, 'generateOTP']);

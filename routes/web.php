@@ -31,8 +31,10 @@ Route::get('/terms', [WebController::class, 'terms'])->name('terms');
 Route::get('/profile', [WebController::class, 'profile'])->name('profile');
 
 // Social Auth
-Route::get('/auth/{provider}', [\App\Http\Controllers\AuthSocialController::class, 'redirectToProvider'])->name('auth.social');
-Route::get('/auth/{provider}/callback', [\App\Http\Controllers\AuthSocialController::class, 'handleProviderCallback']);
+Route::get('/auth/google', [\App\Http\Controllers\SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\SocialAuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/facebook', [\App\Http\Controllers\SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook');
+Route::get('/auth/facebook/callback', [\App\Http\Controllers\SocialAuthController::class, 'handleFacebookCallback']);
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
