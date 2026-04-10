@@ -13,6 +13,14 @@ class SocialAuthController extends Controller
 {
     public function redirectToGoogle()
     {
+        $clientId = config('services.google.client_id');
+        $clientSecret = config('services.google.client_secret');
+
+        if (!$clientId || !$clientSecret || $clientId === 'your-google-client-id' || $clientSecret === 'your-google-client-secret') {
+            \Illuminate\Support\Facades\Log::error('Google login attempted but credentials are not configured.');
+            return redirect('/profile')->with('error', 'Google login is not configured. Please set your Google OAuth credentials in the .env file.');
+        }
+
         return Socialite::driver('google')->stateless()->redirect();
     }
 
@@ -56,6 +64,14 @@ class SocialAuthController extends Controller
 
     public function redirectToFacebook()
     {
+        $clientId = config('services.facebook.client_id');
+        $clientSecret = config('services.facebook.client_secret');
+
+        if (!$clientId || !$clientSecret || $clientId === 'your-facebook-client-id' || $clientSecret === 'your-facebook-client-secret') {
+            \Illuminate\Support\Facades\Log::error('Facebook login attempted but credentials are not configured.');
+            return redirect('/profile')->with('error', 'Facebook login is not configured. Please set your Facebook OAuth credentials in the .env file.');
+        }
+
         return Socialite::driver('facebook')->stateless()->redirect();
     }
 

@@ -68,6 +68,16 @@
 @endpush
 
 @section('content')
+@if(session('error'))
+<div style="max-width: 800px; margin: 100px auto 0; padding: 15px 20px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; color: #b91c1c; font-size: 14px; text-align: center;">
+    ⚠️ {{ session('error') }}
+</div>
+@endif
+@if(session('success'))
+<div style="max-width: 800px; margin: 100px auto 0; padding: 15px 20px; background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; color: #166534; font-size: 14px; text-align: center;">
+    ✅ {{ session('success') }}
+</div>
+@endif
 <div class="account-container">
     <!-- Luxury Sidebar -->
     <aside class="account-sidebar">

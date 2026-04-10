@@ -24,37 +24,34 @@ var api = {
     async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
         const headers = this.getHeaders(options.auth);
-        
+
         const fetchOptions = {
             method: options.method || 'GET',
             headers: headers,
-            ...options
         };
-        
-        // Don't modify body if it's already a string (JSON.stringify was called)
+
+        // Handle body — if it's already a string (JSON.stringify was called), use as-is
+        // If it's an object, stringify it
         if (options.body && typeof options.body === 'object') {
             fetchOptions.body = JSON.stringify(options.body);
         } else if (options.body) {
             fetchOptions.body = options.body;
         }
-        
+
         try {
             const response = await fetch(url, fetchOptions);
-        
-        try {
-            const response = await fetch(url, fetchOptions);
-            
+
             // Handle non-JSON responses
             const contentType = response.headers.get('content-type');
             let data;
-            
+
             if (contentType && contentType.includes('application/json')) {
                 data = await response.json();
             } else {
                 const text = await response.text();
-                data = { message: text, success: !response.ok };
+                data = { message: text, success: false };
             }
-            
+
             if (!response.ok) {
                 console.error('API Error:', response.status, data);
                 throw data;
@@ -108,7 +105,7 @@ var api = {
         return this.request('/cart/add', {
             method: 'POST',
             auth: true,
-            body: JSON.stringify({ product_id: productId, quantity })
+            body: { product_id: productId, quantity }
         });
     },
 
@@ -116,7 +113,7 @@ var api = {
         return this.request(`/cart/items/${itemId}`, {
             method: 'PUT',
             auth: true,
-            body: JSON.stringify({ quantity })
+            body: { quantity }
         });
     },
 
@@ -152,7 +149,7 @@ var api = {
         return this.request(`/orders/${id}/pay`, {
             method: 'POST',
             auth: true,
-            body: JSON.stringify({ method })
+            body: { method }
         });
     },
 

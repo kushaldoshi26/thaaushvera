@@ -1,6 +1,6 @@
-// Declare API_BASE_URL only if not already declared
+// Auto-detect API base URL: production vs local development
 if (typeof API_BASE_URL === 'undefined') {
-    var API_BASE_URL = 'http://localhost:8000/api';
+    var API_BASE_URL = '/api';
 }
 
 var api = {
@@ -10,8 +10,9 @@ var api = {
 
     getHeaders(includeAuth = false) {
         const headers = {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'X-Requested-With': 'XMLHttpRequest'
         };
         if (includeAuth) {
             const token = this.getToken();
@@ -22,27 +23,58 @@ var api = {
 
     async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
-        const response = await fetch(url, {
-            ...options,
-            headers: this.getHeaders(options.auth)
-        });
-        const data = await response.json();
-        if (!response.ok) throw data;
-        return data;
+        const headers = this.getHeaders(options.auth);
+
+        const fetchOptions = {
+            method: options.method || 'GET',
+            headers: headers,
+        };
+
+        // Handle body — if it's already a string (JSON.stringify was called), use as-is
+        // If it's an object, stringify it
+        if (options.body && typeof options.body === 'object') {
+            fetchOptions.body = JSON.stringify(options.body);
+        } else if (options.body) {
+            fetchOptions.body = options.body;
+        }
+
+        try {
+            const response = await fetch(url, fetchOptions);
+
+            // Handle non-JSON responses
+            const contentType = response.headers.get('content-type');
+            let data;
+
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                data = { message: text, success: false };
+            }
+
+            if (!response.ok) {
+                console.error('API Error:', response.status, data);
+                throw data;
+            }
+            return data;
+        } catch (error) {
+            console.error('Request failed:', error);
+            throw error;
+        }
     },
 
     // Auth
     async register(userData) {
         return this.request('/register', {
             method: 'POST',
-            body: JSON.stringify(userData)
+            body: userData
         });
     },
 
     async login(email, password) {
         return this.request('/login', {
             method: 'POST',
-            body: JSON.stringify({ email, password })
+            body: { email, password }
         });
     },
 
@@ -73,7 +105,7 @@ var api = {
         return this.request('/cart/add', {
             method: 'POST',
             auth: true,
-            body: JSON.stringify({ product_id: productId, quantity })
+            body: { product_id: productId, quantity }
         });
     },
 
@@ -81,7 +113,7 @@ var api = {
         return this.request(`/cart/items/${itemId}`, {
             method: 'PUT',
             auth: true,
-            body: JSON.stringify({ quantity })
+            body: { quantity }
         });
     },
 
@@ -117,7 +149,7 @@ var api = {
         return this.request(`/orders/${id}/pay`, {
             method: 'POST',
             auth: true,
-            body: JSON.stringify({ method })
+            body: { method }
         });
     },
 
