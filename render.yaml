@@ -1,63 +1,60 @@
 services:
   - type: web
-    name: thaaushvera
-    runtime: docker
-    plan: free
-    rootDir: .
-    dockerfilePath: ./Dockerfile
-    healthCheckPath: /api/health
-    disk:
-      name: thaaushvera-data
-      mountPath: /var/data
-      sizeGB: 1
+    name: aushvera-backend
+    env: php
+    rootDir: backend
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php artisan serve --host=0.0.0.0 --port=10000
     envVars:
       - key: APP_NAME
-        value: AUSHVERA
+        value: Aushvera
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: false
+        value: "false"
       - key: APP_URL
-        value: https://thaushveraa.onrender.com
+        value: https://aushvera-backend.onrender.com
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: dpg-your-db-host
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        value: your-db-name
+      - key: DB_USERNAME
+        value: your-db-user
+      - key: DB_PASSWORD
+        generateValue: true
       - key: APP_KEY
         generateValue: true
-      - key: DB_CONNECTION
-        value: sqlite
-      - key: DB_DATABASE
-        value: /var/data/database.sqlite
-      - key: LOG_CHANNEL
-        value: stderr
-      # Social Login Placeholders
-      - key: GOOGLE_CLIENT_ID
-        sync: false
-      - key: GOOGLE_CLIENT_SECRET
-        sync: false
-      - key: FACEBOOK_CLIENT_ID
-        sync: false
-      - key: FACEBOOK_CLIENT_SECRET
-        sync: false
-      # Other Config
       - key: SESSION_DRIVER
-        value: file
-      - key: CACHE_DRIVER
-        value: file
-      # Razorpay Payment Integration
-      - key: RAZORPAY_KEY
-        sync: false
-      - key: RAZORPAY_SECRET
-        sync: false
-      # Email Configuration (SMTP)
-      - key: MAIL_MAILER
-        value: smtp
-      - key: MAIL_HOST
-        sync: false
-      - key: MAIL_PORT
-        value: "587"
-      - key: MAIL_USERNAME
-        sync: false
-      - key: MAIL_PASSWORD
-        sync: false
-      - key: MAIL_ENCRYPTION
-        value: tls
-      - key: ADMIN_EMAIL
-        value: admin@aushvera.com
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: GOOGLE_CLIENT_ID
+        value: your-google-id
+      - key: GOOGLE_CLIENT_SECRET
+        value: your-google-secret
+      - key: GOOGLE_REDIRECT_URI
+        value: https://aushvera-backend.onrender.com/auth/google/callback
+      - key: FACEBOOK_CLIENT_ID
+        value: your-facebook-id
+      - key: FACEBOOK_CLIENT_SECRET
+        value: your-facebook-secret
+      - key: FACEBOOK_REDIRECT_URI
+        value: https://aushvera-backend.onrender.com/auth/facebook/callback
+      - key: AI_SERVER_URL
+        value: https://aushvera-ai-agent.onrender.com
+
+  - type: web
+    name: aushvera-ai-agent
+    env: python
+    rootDir: ai-agent
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
