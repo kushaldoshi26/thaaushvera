@@ -337,6 +337,34 @@
 @push('scripts')
 <script src="{{ asset('api-config.js') }}"></script>
 <script>
+    // Handle server-side authenticated user (from OAuth flow)
+    @if($user ?? null)
+        (function() {
+            const serverUser = @json($user);
+            if (serverUser && serverUser.id) {
+                localStorage.setItem('auth_token', 'session_auth');
+                localStorage.setItem('currentUser', JSON.stringify(serverUser));
+                
+                // Update display immediately
+                const displayName = document.getElementById('displayName');
+                const displayEmail = document.getElementById('displayEmail');
+                const displayPhone = document.getElementById('displayPhone');
+                const displayDob = document.getElementById('displayDob');
+                const displayGender = document.getElementById('displayGender');
+                const displayAddress = document.getElementById('displayAddress');
+                const authText = document.getElementById('authText');
+                
+                if (displayName) displayName.textContent = serverUser.name || 'User';
+                if (displayEmail) displayEmail.textContent = serverUser.email || '';
+                if (displayPhone) displayPhone.textContent = serverUser.phone || 'Not provided';
+                if (displayDob) displayDob.textContent = serverUser.dob || 'Not provided';
+                if (displayGender) displayGender.textContent = serverUser.gender || 'Not provided';
+                if (displayAddress) displayAddress.textContent = serverUser.address || 'Not provided';
+                if (authText) authText.textContent = 'Logout';
+            }
+        })();
+    @endif
+    
     // FORCE CLEAR OLD TOKENS ON PAGE LOAD
     (function() {
         // Clear any old/invalid tokens

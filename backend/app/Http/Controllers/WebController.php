@@ -108,7 +108,8 @@ class WebController extends Controller
 
     public function profile()
     {
-        return view('frontend.profile');
+        $user = auth()->user();
+        return view('frontend.profile', compact('user'));
     }
 
     public function terms()

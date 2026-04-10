@@ -234,6 +234,9 @@ async function handleAuthClick(event) {
 
 // Make function globally available
 window.handleAuthClick = handleAuthClick;
+
+// Handle login form submission
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;

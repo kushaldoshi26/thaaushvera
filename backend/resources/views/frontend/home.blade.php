@@ -63,7 +63,7 @@
             <a href="{{ route('about') }}" class="btn-outline">Our Story</a>
         </div>
         <div class="heritage-image">
-            <img src="{{ asset('assets/img/ritual-image.png') }}" alt="Ritual Scene" style="width: 80%; height: 80%; object-fit: contain;" onerror="this.src='https://images.unsplash.com/photo-1616628188859-7a11abb6fcc9?w=800'">
+            <img src="{{ asset('assets/img/ritual-image.png') }}" alt="Ritual Scene" onerror="this.style.display='none'">
         </div>
     </div>
 </section>
