@@ -1,0 +1,273 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminManagementController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\AdminRegisterController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\OAuthController;
+use App\Http\Controllers\AdminPasswordGeneratorController;
+use App\Http\Controllers\OTPController;
+
+// Debug endpoint to inspect request payloads
+Route::post('/debug', function(Request $request) {
+    return response()->json([
+        'all' => $request->all(),
+        'content' => $request->getContent(),
+        'headers' => $request->headers->all(),
+    ]);
+});
+
+// Health check endpoint with deep schema validation
+Route::get('/health', function() {
+    try {
+        $dbConnected = false;
+        try {
+            \DB::connection()->getPdo();
+            $dbConnected = true;
+        } catch (\Exception $e) {
+            $dbError = $e->getMessage();
+        }
+
+        $tableExists = \Schema::hasTable('users');
+        $requiredColumns = [
+            'name', 'email', 'password', 'role', 
+            'phone', 'dob', 'gender', 'pincode', 
+            'city', 'state', 'address',
+            'oauth_provider', 'oauth_id', 'is_active', 'last_login_at'
+        ];
+        
+        $missingColumns = [];
+        $existingColumns = [];
+        if ($tableExists) {
+            foreach ($requiredColumns as $column) {
+                if (\Schema::hasColumn('users', $column)) {
+                    $existingColumns[] = $column;
+                } else {
+                    $missingColumns[] = $column;
+                }
+            }
+        }
+        
+        $status = ($dbConnected && $tableExists && count($missingColumns) === 0) ? 'healthy' : 'degraded';
+        
+        return response()->json([
+            'status' => $status,
+            'database' => [
+                'connected' => $dbConnected,
+                'error' => $dbError ?? null,
+            ],
+            'table_users' => [
+                'exists' => $tableExists,
+                'schema_status' => count($missingColumns) === 0 ? 'complete' : 'incomplete',
+                'missing_columns' => $missingColumns,
+                'existing_columns' => $existingColumns,
+            ],
+            'environment' => [
+                'app_key_set' => config('app.key') ? true : false,
+                'debug_mode' => config('app.debug'),
+                'url' => config('app.url'),
+            ],
+            'timestamp' => now()->toIso8601String(),
+        ], $status === 'healthy' ? 200 : 500);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'critical_error',
+            'message' => $e->getMessage(),
+            'timestamp' => now()->toIso8601String()
+        ], 500);
+    }
+});
+
+// TEMPORARY: Detailed health audit for all tables
+Route::get('/detailed-health', function() {
+    $tables = ['users', 'carts', 'cart_items', 'products', 'categories', 'orders', 'order_items', 'reviews', 'banners', 'coupons'];
+    $report = [];
+    
+    foreach ($tables as $table) {
+        $exists = \Schema::hasTable($table);
+        $report[$table] = [
+            'exists' => $exists,
+            'count' => $exists ? \DB::table($table)->count() : 0,
+        ];
+    }
+    
+    return response()->json($report);
+});
+
+// TEMPORARY: Log viewer to identify 500 errors on Render
+Route::get('/logs', function() {
+    $logPath = storage_path('logs/laravel.log');
+    if (!file_exists($logPath)) {
+        return response()->json(['message' => 'Log file not found at ' . $logPath]);
+    }
+    
+    $logs = shell_exec('tail -n 100 ' . escapeshellarg($logPath));
+    return response()->json([
+        'path' => $logPath,
+        'last_100_lines' => explode("\n", $logs)
+    ]);
+});
+
+// Public banner routes
+Route::get('/banners', [BannerController::class, 'index']);
+
+// Public auth routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/admin/register', [AdminRegisterController::class, 'register']);
+
+// OAuth routes (public)
+Route::post('/oauth/callback', [OAuthController::class, 'handleGoogleCallback']);
+
+// OTP routes (public)
+Route::post('/otp/generate', [OTPController::class, 'generateOTP']);
+Route::post('/otp/verify', [OTPController::class, 'verifyOTP']);
+Route::post('/otp/resend', [OTPController::class, 'resendOTP']);
+Route::post('/otp/verify-2fa', [OTPController::class, 'verify2FACode']);
+
+// Public product routes
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/{id}/reviews', [ReviewController::class, 'getProductReviews']);
+
+// Public category routes
+Route::get('/categories', [CategoryController::class, 'index']);
+
+// Protected routes (require auth:sanctum)
+Route::middleware('auth:sanctum')->group(function () {
+    // Auth routes
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'user']);
+    
+    // OAuth account management (authenticated users)
+    Route::post('/oauth/link', [OAuthController::class, 'linkOAuthAccount']);
+    Route::post('/oauth/unlink', [OAuthController::class, 'unlinkOAuthAccount']);
+    Route::get('/oauth/connected-providers', [OAuthController::class, 'getConnectedProviders']);
+    
+    // OTP status (authenticated users)
+    Route::get('/otp/status', [OTPController::class, 'getOTPStatus']);
+
+    // Cart routes
+    Route::get('/cart', [CartController::class, 'show']);
+    Route::post('/cart/add', [CartController::class, 'addItem']);
+    Route::put('/cart/items/{itemId}', [CartController::class, 'updateItem']);
+    Route::delete('/cart/items/{itemId}', [CartController::class, 'removeItem']);
+    Route::delete('/cart/clear', [CartController::class, 'clear']);
+    Route::get('/cart/count', [CartController::class, 'count']);
+
+    // Order routes
+    Route::post('/checkout', [OrderController::class, 'checkout']);
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+    Route::post('/orders/{id}/pay', [OrderController::class, 'pay']);
+
+    // Review routes
+    Route::post('/reviews', [ReviewController::class, 'store']);
+});
+
+// Protected admin routes (require auth:sanctum + admin role)
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard']);
+
+    // User management
+    Route::get('/users', [AdminController::class, 'users']);
+    Route::get('/users/{id}', [AdminController::class, 'getUser']);
+    Route::put('/users/{id}', [AdminController::class, 'updateUser']);
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+
+    // Product management
+    Route::apiResource('products', ProductController::class)->except(['index', 'show']);
+
+    // Order management
+    Route::get('/orders', [AdminController::class, 'orders']);
+    Route::get('/orders/{id}', [AdminController::class, 'getOrder']);
+    Route::put('/orders/{id}/status', [AdminController::class, 'updateOrderStatus']);
+
+    // Review management
+    Route::get('/reviews', [AdminController::class, 'reviews']);
+    Route::put('/reviews/{id}/status', [AdminController::class, 'updateReviewStatus']);
+    Route::delete('/reviews/{id}', [AdminController::class, 'deleteReview']);
+
+    // Login history
+    Route::get('/login-history', [AdminController::class, 'loginHistory']);
+
+    // Category management
+    Route::apiResource('categories', CategoryController::class)->except(['show']);
+
+    // Subscription offers (Marketing)
+    Route::apiResource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class);
+
+    // Admin Management (Super Admin only)
+    Route::prefix('admins')->group(function () {
+        Route::get('/', [AdminManagementController::class, 'index']);
+        Route::post('/', [AdminManagementController::class, 'store']);
+        Route::put('/{id}', [AdminManagementController::class, 'update']);
+        Route::post('/{id}/reset-password', [AdminManagementController::class, 'resetPassword']);
+        Route::put('/{id}/toggle-status', [AdminManagementController::class, 'toggleStatus']);
+        Route::delete('/{id}', [AdminManagementController::class, 'destroy']);
+    });
+
+    // Activity Logs
+    Route::get('/activity-logs', [AdminManagementController::class, 'activityLogs']);
+    
+    // Admin Password Generator (Super Admin only)
+    Route::prefix('generator')->group(function () {
+        Route::post('/credentials', [AdminPasswordGeneratorController::class, 'generate']);
+        Route::post('/verify-2fa', [AdminPasswordGeneratorController::class, 'verify2FA']);
+        Route::get('/search-admin', [AdminPasswordGeneratorController::class, 'searchAdminId']);
+        Route::get('/export-credentials/{adminId}', [AdminPasswordGeneratorController::class, 'exportCredentials']);
+    });
+
+    // Change Own Password
+    Route::post('/change-password', [AdminManagementController::class, 'changeOwnPassword']);
+
+    // Analytics & Reports
+    Route::get('/analytics/top-products', [AnalyticsController::class, 'topProducts']);
+    Route::get('/analytics/top-customers', [AnalyticsController::class, 'topCustomers']);
+    Route::get('/analytics/sales-report', [AnalyticsController::class, 'salesReport']);
+
+    // Export System
+    Route::get('/export/orders', [AnalyticsController::class, 'exportOrders']);
+    Route::get('/export/users', [AnalyticsController::class, 'exportUsers']);
+    Route::get('/export/products', [AnalyticsController::class, 'exportProducts']);
+
+    // Inventory Management
+    Route::post('/inventory/{productId}/adjust', [InventoryController::class, 'adjustStock']);
+    Route::get('/inventory/low-stock', [InventoryController::class, 'getLowStock']);
+    Route::get('/inventory/{productId}/history', [InventoryController::class, 'getStockHistory']);
+    Route::post('/inventory/bulk-update', [InventoryController::class, 'bulkUpdateStock']);
+    Route::get('/inventory/stats', [InventoryController::class, 'getInventoryStats']);
+
+    // Banner management
+    Route::get('/banners', [BannerController::class, 'index']);
+    Route::post('/banners', [BannerController::class, 'store']);
+    Route::put('/banners/{id}', [BannerController::class, 'update']);
+    Route::put('/banners/{id}/toggle', [BannerController::class, 'toggle']);
+    Route::delete('/banners/{id}', [BannerController::class, 'destroy']);
+    Route::post('/banners/upload', [BannerController::class, 'upload']);
+    Route::post('/banners/delete', [BannerController::class, 'delete']);
+});
+
+// Public coupon validation (no auth required)
+Route::post('/coupons/validate', [CouponController::class, 'validate']);
+
+// Payment verification
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/payment/create-razorpay-order', [\App\Http\Controllers\PaymentController::class, 'createRazorpayOrder']);
+    Route::post('/payment/verify', [\App\Http\Controllers\PaymentController::class, 'verifyPayment']);
+});
+Route::post('/payment/webhook', [\App\Http\Controllers\PaymentController::class, 'webhook']);
