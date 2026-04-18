@@ -26,8 +26,24 @@
 @media (max-width: 900px) {
     .nav-burger { display: flex; }
     .nav-left, .nav-right .nav-links { display: none !important; }
-    .nav-container { grid-template-columns: auto 1fr auto; gap: 0; }
-    .nav-center { justify-content: center; }
+    
+    /* Restructure nav: burger | logo (centered) | icons */
+    .nav-container {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.2rem;
+    }
+    .nav-center {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: auto;
+    }
+    .nav-logo { width: 40px; height: 40px; }
+    .nav-center span { font-size: 1.2rem; letter-spacing: 2px; }
+    .nav-right { gap: 16px; }
+    .nav-burger { order: -1; }
     
     .hero { min-height: 450px; padding: 2rem; }
     .hero h1, .hero-text h1 { font-size: 36px !important; }
