@@ -57,46 +57,66 @@
     
     /* Hero / Banner fixes for mobile */
     .hero { 
-        min-height: 400px; 
+        min-height: 380px; 
+        max-height: 480px;
         padding: 2rem 1.5rem;
         align-items: center;
         justify-content: center;
+        margin-top: 65px;
     }
-    .hero-content { margin-top: 0; }
+    .hero-content { margin-top: 0; width: 100%; }
     .hero-text { text-align: center; max-width: 100%; }
-    .hero h1, .hero-text h1 { font-size: 32px !important; text-align: center !important; }
-    .hero-text h1 span { font-size: 38px !important; }
-    .ornamental-divider { justify-content: center !important; }
-    .ornamental-divider img { max-width: 250px; }
-    .cta-primary { padding: 12px 28px; font-size: 11px; }
+    .hero h1, .hero-text h1 { 
+        font-size: 28px !important; 
+        text-align: center !important; 
+        line-height: 1.25 !important;
+        margin: 6px 0 !important;
+    }
+    .hero-text h1 span { font-size: 34px !important; }
+    
+    /* Hide ornamental dividers on mobile — they cause text overlap */
+    .ornamental-divider { display: none !important; }
+    
+    .cta-primary { 
+        padding: 12px 28px; 
+        font-size: 11px; 
+        margin-top: 12px !important;
+    }
     
     /* Banner slide images — fill properly on mobile */
     .banner-slide img { 
         object-fit: cover !important; 
-        object-position: center !important;
+        object-position: right center !important;
+        width: 100% !important;
         height: 100% !important;
     }
     
     /* Heritage section — fully centered */
     .heritage { padding: 4rem 1.5rem; }
-    .heritage-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .heritage-grid { 
+        grid-template-columns: 1fr !important; 
+        gap: 2rem; 
+        text-align: center;
+    }
     .heritage-text { text-align: center; }
     .heritage-text h2 { font-size: 26px; text-align: center; }
     .heritage-text p { text-align: center; }
     .heritage-text .btn-outline { display: inline-block; margin: 16px auto 0; }
     .heritage-image { 
         order: -1; 
-        display: flex; 
-        justify-content: center; 
-        align-items: center; 
+        display: flex !important; 
+        justify-content: center !important; 
+        align-items: center !important;
+        width: 100%;
     }
     .heritage-image img { 
-        max-height: 280px !important; 
+        max-height: 250px !important; 
         width: auto !important;
-        max-width: 90% !important;
+        max-width: 80% !important;
         margin: 0 auto !important; 
         display: block !important;
         object-fit: contain !important;
+        border-radius: 8px !important;
     }
     
     .pillars { grid-template-columns: 1fr; gap: 3rem; }
