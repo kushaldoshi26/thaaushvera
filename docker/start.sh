@@ -13,7 +13,7 @@ APP_NAME=${APP_NAME:-AUSHVERA}
 APP_ENV=${APP_ENV:-production}
 APP_KEY=${APP_KEY:-}
 APP_DEBUG=${APP_DEBUG:-false}
-APP_URL=${APP_URL:-https://thaaushvera.onrender.com}
+APP_URL=${APP_URL:-https://thaaaaaaushvera.onrender.com}
 
 LOG_CHANNEL=stderr
 LOG_LEVEL=error
@@ -61,13 +61,16 @@ fi
 
 # ─── Ensure SQLite database file exists ──────────────────────────────────────
 DB_PATH=${DB_DATABASE:-/var/data/database.sqlite}
+# Ensure /var/data directory is writable (SQLite needs dir-level write for journal files)
 mkdir -p "$(dirname $DB_PATH)"
+chown -R www-data:www-data "$(dirname $DB_PATH)" 2>/dev/null || true
+chmod -R 775 "$(dirname $DB_PATH)" 2>/dev/null || true
 if [ ! -f "$DB_PATH" ]; then
     echo "Creating SQLite database at $DB_PATH..."
     touch "$DB_PATH"
+    chown www-data:www-data "$DB_PATH" 2>/dev/null || true
+    chmod 664 "$DB_PATH" 2>/dev/null || true
 fi
-chmod 664 "$DB_PATH" 2>/dev/null || true
-chown www-data:www-data "$DB_PATH" 2>/dev/null || true
 
 # ─── Storage & cache permissions ─────────────────────────────────────────────
 mkdir -p /var/www/html/storage/logs \

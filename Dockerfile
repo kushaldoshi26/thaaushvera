@@ -41,11 +41,11 @@ RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions \
 # Install PHP dependencies (no dev)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Set up SQLite database
+# Set up SQLite database (directory must also be writable for journal/WAL files)
 RUN mkdir -p /var/data \
-    && if [ ! -f /var/data/database.sqlite ]; then touch /var/data/database.sqlite; fi \
-    && chmod 664 /var/data/database.sqlite \
-    && chown www-data:www-data /var/data/database.sqlite
+    && touch /var/data/database.sqlite \
+    && chown -R www-data:www-data /var/data \
+    && chmod -R 775 /var/data
 
 # Configure Apache to serve Laravel's public folder
 COPY docker/apache-laravel.conf /etc/apache2/sites-available/000-default.conf
