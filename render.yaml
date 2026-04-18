@@ -18,7 +18,7 @@ services:
       - key: APP_DEBUG
         value: false
       - key: APP_URL
-        value: https://thaushveraa.onrender.com
+        value: https://thaaushvera.onrender.com
       - key: APP_KEY
         generateValue: true
       - key: DB_CONNECTION
@@ -33,13 +33,13 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: GOOGLE_REDIRECT_URI
-        value: https://thaushveraa.onrender.com/auth/google/callback
+        value: https://thaaushvera.onrender.com/auth/google/callback
       - key: FACEBOOK_CLIENT_ID
         sync: false
       - key: FACEBOOK_CLIENT_SECRET
         sync: false
       - key: FACEBOOK_REDIRECT_URI
-        value: https://thaushveraa.onrender.com/auth/facebook/callback
+        value: https://thaaushvera.onrender.com/auth/facebook/callback
       # Other Config
       - key: SESSION_DRIVER
         value: file
