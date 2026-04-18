@@ -54,16 +54,18 @@
 </section>
 
 <section class="heritage fade-in">
-    <div class="heritage-grid">
-        <div class="heritage-text">
-            <h2>Honoring Heritage, Refining Wellness.</h2>
-            <p>For centuries, botanical rituals have sustained vitality across cultures. AUSHVERA honors this wisdom—not by replicating the past, but by refining it for the present.</p>
-            <p>Each formulation is a study in restraint: only what serves, nothing more. Clean ingredients. Timeless presentation. Quiet confidence.</p>
-            <p>Improve respiratory health and digestion.</p>
-            <a href="{{ route('about') }}" class="btn-outline">Our Story</a>
-        </div>
-        <div class="heritage-image">
-            <img src="{{ asset('assets/img/ritual-image.png') }}" alt="Ritual Scene" onerror="this.style.display='none'" style="max-height: 400px; width: auto; max-width: 100%; object-fit: contain; border-radius: 8px;">
+    <div class="container">
+        <div class="heritage-grid">
+            <div class="heritage-text">
+                <h2>Honoring Heritage, Refining Wellness.</h2>
+                <p>For centuries, botanical rituals have sustained vitality across cultures. AUSHVERA honors this wisdom—not by replicating the past, but by refining it for the present.</p>
+                <p>Each formulation is a study in restraint: only what serves, nothing more. Clean ingredients. Timeless presentation. Quiet confidence.</p>
+                <p>Improve respiratory health and digestion.</p>
+                <a href="{{ route('about') }}" class="btn-outline">Our Story</a>
+            </div>
+            <div class="heritage-image">
+                <img src="{{ asset('assets/img/ritual-image.png') }}" alt="Ritual Scene" onerror="this.style.display='none'" style="max-height: 500px; width: auto; max-width: 100%; object-fit: contain; border-radius: 8px;">
+            </div>
         </div>
     </div>
 </section>

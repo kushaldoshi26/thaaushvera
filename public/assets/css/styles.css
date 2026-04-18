@@ -240,21 +240,44 @@ button { cursor: pointer; font-family: inherit; }
     overflow: hidden;
     background: var(--bg);
 }
-.hero-bg { position: absolute; inset: 0; }
-.hero-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.45; }
-.hero-overlay {
+.banner-slider {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(11,28,45,0.3) 0%, rgba(11,28,45,0.7) 100%);
+    width: 100%;
+    height: 100%;
+    z-index: 0;
 }
+.banner-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    width: 100%;
+    height: 100%;
+}
+.banner-slide.active { opacity: 1; z-index: 1; }
+.banner-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+}
+
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     text-align: center;
     color: var(--cream);
     padding: 0 1.5rem;
-    max-width: 800px;
+    max-width: 1200px;
+    width: 100%;
 }
+.hero-slide-content {
+    display: none;
+    animation: fadeIn 0.8s ease-out forwards;
+}
+.hero-slide-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .hero-eyebrow {
     font-family: var(--font-sans);
     font-size: 0.75rem;
@@ -416,7 +439,7 @@ section { padding: 5rem 0; }
 .add-to-cart-btn { flex-shrink: 0; }
 
 /* ---------- Heritage ---------- */
-.heritage-section { background: var(--bg-light); }
+.heritage { background: var(--bg-light); padding: 6rem 0; }
 .heritage-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -426,7 +449,7 @@ section { padding: 5rem 0; }
     transition: opacity 0.6s, transform 0.6s;
 }
 .heritage-grid.revealed { opacity: 1; }
-.heritage-img img { border-radius: var(--radius); width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.heritage-image img { border-radius: var(--radius); width: 100%; aspect-ratio: auto; object-fit: contain; }
 .heritage-text h2 {
     font-family: var(--font-serif);
     font-size: clamp(1.5rem, 2.5vw, 2.25rem);
