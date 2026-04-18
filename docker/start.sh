@@ -90,6 +90,10 @@ php artisan migrate --force --no-interaction 2>&1 || echo "Migration note: may a
 echo "Seeding super admin..."
 php artisan db:seed --class=SuperAdminSeeder --force 2>&1 || echo "Seeder note: super admin already exists"
 
+# ─── Seed sample products ─────────────────────────────────────────────────
+echo "Seeding sample products..."
+php artisan db:seed --class=ProductSeeder --force 2>&1 || echo "Seeder note: products may already exist"
+
 # ─── Cache for performance ───────────────────────────────────────────────────
 echo "Caching config and routes..."
 php artisan config:cache 2>&1 || true

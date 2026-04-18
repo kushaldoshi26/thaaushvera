@@ -200,7 +200,7 @@
 @push('scripts')
 <script>
     const productsRoute = "{{ route('products') }}";
-    const paymentRoute = "{{ route('payment') }}";
+    const paymentRoute = "{{ url('/checkout') }}";
     
     // Load cart from localStorage
     function renderCart() {
