@@ -3172,8 +3172,67 @@ footer::before {
 }
 
 @media (max-width: 900px) {
-    .nav-burger { display: flex; }
-    .nav-left, .nav-right .nav-links { display: none !important; }
+    .nav-container {
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-end !important;
+        position: relative;
+        padding: 0.8rem 1rem !important;
+        height: 70px !important;
+    }
+    .nav-center {
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        pointer-events: auto !important;
+        margin: 0 !important;
+        order: -1;
+    }
+    .nav-center span {
+        font-size: 1.1rem !important;
+        letter-spacing: 2px !important;
+        font-weight: 700 !important;
+    }
+    .nav-logo {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    .nav-left { display: none !important; }
+    .nav-right {
+        display: flex !important;
+        align-items: center;
+        gap: 12px !important;
+        margin-right: 8px !important;
+    }
+    .nav-right .nav-links { display: none !important; }
+    
+    .nav-burger {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        margin-left: 5px;
+    }
+    .nav-burger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background-color: #B8964C !important;
+        border-radius: 2px;
+    }
+
+    /* Banner/Hero fix for mobile logo centering */
+    .hero {
+        margin-top: 70px !important;
+        padding-top: 2rem !important;
+    }
 }
 
 /* =====================================================
