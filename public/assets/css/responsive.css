@@ -28,14 +28,44 @@
     .nav-left { display: none !important; }
     .nav-right .nav-links { display: none !important; }
     
-    /* Restructure nav: burger | logo (centered) | icons */
+    /* Restructure nav: Logo (left) | Icons + Burger (right) */
     .nav-container {
         display: flex !important;
         align-items: center;
+        justify-content: space-between !important;
         position: relative;
-        padding: 0.8rem 1.2rem;
+        padding: 0.8rem 1.25rem !important;
         gap: 0;
     }
+    .nav-center {
+        order: 0;
+        flex: 0 1 auto !important;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start !important;
+        margin-right: auto !important;
+        pointer-events: auto;
+        transform: none !important;
+        position: static !important;
+        left: auto !important;
+    }
+    .nav-center span { 
+        font-size: 1.1rem !important; 
+        letter-spacing: 2px !important;
+        margin-left: 8px;
+    }
+    .nav-logo { width: 34px !important; height: 34px !important; }
+
+    .nav-right {
+        order: 1;
+        flex-shrink: 0;
+        display: flex !important;
+        align-items: center;
+        gap: 20px !important;
+        margin-left: auto !important;
+    }
+    .nav-right .nav-links { display: none !important; }
+    
     .nav-burger { 
         order: 2;
         flex-shrink: 0;
@@ -45,34 +75,15 @@
         flex-direction: column;
         gap: 5px;
         padding: 5px;
+        margin-left: 10px !important;
     }
     .nav-burger span {
         display: block;
         width: 25px;
         height: 2px;
-        background-color: var(--gold) !important;
+        background-color: #B8964C !important; /* Explicit brand gold */
         transition: 0.3s;
     }
-    .nav-center {
-        order: 1;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: auto;
-    }
-    .nav-right {
-        order: 0;
-        flex-shrink: 0;
-        display: flex !important;
-        align-items: center;
-        gap: 15px;
-        margin-right: 10px;
-    }
-    .nav-right .nav-links { display: none !important; }
-    
-    .nav-logo { width: 34px; height: 34px; }
-    .nav-center span { font-size: 1rem; letter-spacing: 2px; }
     
     /* Hero / Banner fixes for mobile */
     .hero { 
