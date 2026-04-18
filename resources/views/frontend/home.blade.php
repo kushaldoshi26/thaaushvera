@@ -63,7 +63,7 @@
             <a href="{{ route('about') }}" class="btn-outline">Our Story</a>
         </div>
         <div class="heritage-image">
-            <img src="{{ asset('assets/img/ritual-image.png') }}" alt="Ritual Scene" onerror="this.style.display='none'">
+            <img src="{{ asset('assets/img/ritual-image.png') }}" alt="Ritual Scene" onerror="this.style.display='none'" style="max-height: 400px; width: auto; max-width: 100%; object-fit: contain; border-radius: 8px;">
         </div>
     </div>
 </section>

@@ -32,6 +32,7 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'is_deletable',
         'last_login_at',
         'phone',
         'dob',
@@ -65,6 +66,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
             'is_active'         => 'boolean',
+            'is_deletable'      => 'boolean',
             'last_login_at'     => 'datetime',
         ];
     }

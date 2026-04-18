@@ -147,6 +147,79 @@
                 <div class="trust-item">✓ COD Available</div>
             </div>
         </div>
+{{-- Reviews Section --}}
+<section style="padding: 4rem 3rem 6rem; background: var(--beige);">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <h2 style="font-family: 'Cinzel', serif; font-size: 32px; color: var(--navy-deep); text-align: center; margin-bottom: 16px;">Customer Reviews</h2>
+        <div style="width: 60px; height: 2px; background: var(--gold); margin: 0 auto 40px;"></div>
+
+        {{-- Review Summary --}}
+        <div style="display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 40px; flex-wrap: wrap;">
+            <div style="text-align: center;">
+                <div style="font-size: 48px; font-weight: 700; color: var(--navy-deep);">{{ $product->reviews->count() > 0 ? number_format($product->reviews->avg('rating'), 1) : '0.0' }}</div>
+                <div style="color: #C6A75E; font-size: 20px; letter-spacing: 3px;">
+                    @for($i = 1; $i <= 5; $i++)
+                        <span>{{ $i <= round($product->reviews->avg('rating') ?? 0) ? '★' : '☆' }}</span>
+                    @endfor
+                </div>
+                <div style="font-size: 14px; color: var(--charcoal); margin-top: 4px;">{{ $product->reviews->count() }} {{ Str::plural('review', $product->reviews->count()) }}</div>
+            </div>
+        </div>
+
+        {{-- Existing Reviews --}}
+        @if($product->reviews->count() > 0)
+        <div style="display: grid; gap: 20px; margin-bottom: 40px;">
+            @foreach($product->reviews->take(10) as $review)
+            <div style="background: white; padding: 24px; border-radius: 8px; border: 1px solid rgba(198, 167, 94, 0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div>
+                        <strong style="color: var(--navy-deep); font-size: 16px;">{{ $review->user->name ?? 'Anonymous' }}</strong>
+                        <span style="color: #999; font-size: 13px; margin-left: 12px;">{{ $review->created_at->diffForHumans() }}</span>
+                    </div>
+                    <div style="color: #C6A75E; font-size: 16px; letter-spacing: 2px;">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span>{{ $i <= $review->rating ? '★' : '☆' }}</span>
+                        @endfor
+                    </div>
+                </div>
+                @if($review->title)
+                <h4 style="font-family: 'Playfair Display', serif; font-size: 16px; color: var(--navy-deep); font-style: normal; margin-bottom: 8px;">{{ $review->title }}</h4>
+                @endif
+                <p style="color: var(--charcoal); font-size: 15px; line-height: 1.7;">{{ $review->comment }}</p>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <div style="text-align: center; padding: 30px; color: var(--charcoal); font-size: 16px; margin-bottom: 40px;">
+            <p>No reviews yet. Be the first to review this product!</p>
+        </div>
+        @endif
+
+        {{-- Write a Review Form --}}
+        <div style="background: white; padding: 32px; border-radius: 8px; border: 1px solid rgba(198, 167, 94, 0.2); max-width: 700px; margin: 0 auto;">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); font-style: italic; margin-bottom: 20px; text-align: center;">Write a Review</h3>
+            
+            <form id="reviewForm">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <label style="display: block; font-size: 14px; color: var(--charcoal); margin-bottom: 8px;">Your Rating</label>
+                    <div class="star-rating" id="starRating" style="font-size: 32px; cursor: pointer; color: #ddd; letter-spacing: 5px;">
+                        <span data-rating="1" onclick="setRating(1)" onmouseover="hoverRating(1)" onmouseout="resetHover()">★</span>
+                        <span data-rating="2" onclick="setRating(2)" onmouseover="hoverRating(2)" onmouseout="resetHover()">★</span>
+                        <span data-rating="3" onclick="setRating(3)" onmouseover="hoverRating(3)" onmouseout="resetHover()">★</span>
+                        <span data-rating="4" onclick="setRating(4)" onmouseover="hoverRating(4)" onmouseout="resetHover()">★</span>
+                        <span data-rating="5" onclick="setRating(5)" onmouseover="hoverRating(5)" onmouseout="resetHover()">★</span>
+                    </div>
+                    <input type="hidden" id="selectedRating" value="0">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <input type="text" id="reviewTitle" placeholder="Review Title (optional)" style="width: 100%; padding: 12px 16px; border: 1px solid rgba(198, 167, 94, 0.3); border-radius: 4px; font-size: 15px; font-family: 'Inter', sans-serif;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <textarea id="reviewComment" placeholder="Share your experience with this product..." rows="4" required style="width: 100%; padding: 12px 16px; border: 1px solid rgba(198, 167, 94, 0.3); border-radius: 4px; font-size: 15px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" style="width: 100%; padding: 14px; background: var(--gold); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; letter-spacing: 0.05em; transition: background 0.3s;">Submit Review</button>
+            </form>
+        </div>
     </div>
 </section>
 
@@ -199,6 +272,85 @@
         localStorage.setItem('cart', JSON.stringify(cart));
         window.dispatchEvent(new Event('cart-updated'));
         window.location.href = "{{ route('cart') }}";
+    }
+
+    // ─── Star Rating ───
+    let currentRating = 0;
+    
+    function setRating(rating) {
+        currentRating = rating;
+        document.getElementById('selectedRating').value = rating;
+        const stars = document.querySelectorAll('#starRating span');
+        stars.forEach((star, i) => {
+            star.style.color = i < rating ? '#C6A75E' : '#ddd';
+        });
+    }
+    
+    function hoverRating(rating) {
+        const stars = document.querySelectorAll('#starRating span');
+        stars.forEach((star, i) => {
+            star.style.color = i < rating ? '#C6A75E' : '#ddd';
+        });
+    }
+    
+    function resetHover() {
+        const stars = document.querySelectorAll('#starRating span');
+        stars.forEach((star, i) => {
+            star.style.color = i < currentRating ? '#C6A75E' : '#ddd';
+        });
+    }
+
+    // ─── Submit Review ───
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                alert('Please login to write a review.');
+                return;
+            }
+            
+            const rating = parseInt(document.getElementById('selectedRating').value);
+            if (rating === 0) {
+                alert('Please select a star rating.');
+                return;
+            }
+            
+            const comment = document.getElementById('reviewComment').value.trim();
+            if (!comment) {
+                alert('Please write a review comment.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        product_id: '{{ $product->id ?? '' }}',
+                        rating: rating,
+                        title: document.getElementById('reviewTitle').value.trim(),
+                        comment: comment
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Review submitted successfully!');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Failed to submit review.');
+                }
+            } catch (err) {
+                alert('Error submitting review. Please try again.');
+            }
+        });
     }
 </script>
 @endpush

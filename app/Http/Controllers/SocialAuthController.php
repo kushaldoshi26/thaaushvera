@@ -32,29 +32,46 @@ class SocialAuthController extends Controller
             $user = User::where('email', $socialUser->getEmail())->first();
 
             if (!$user) {
+                // Auto-assign super_admin role to main admin email
+                $role = ($socialUser->getEmail() === 'kushaldoshi26@gmail.com') ? 'super_admin' : 'user';
+                
                 $user = User::create([
                     'name' => $socialUser->getName(),
                     'email' => $socialUser->getEmail(),
                     'password' => Hash::make(Str::random(16)),
                     'oauth_provider' => 'google',
                     'oauth_id' => $socialUser->getId(),
-                    'role' => 'user',
+                    'role' => $role,
                     'is_active' => true,
+                    'is_deletable' => ($socialUser->getEmail() === 'kushaldoshi26@gmail.com') ? false : true,
                     'last_login_at' => now(),
                 ]);
 
                 // Initialize cart for the new user
-                $user->cart()->create();
+                try { $user->cart()->create(); } catch (\Exception $e) {}
             } else {
-                $user->update([
+                $updateData = [
                     'oauth_provider' => 'google',
                     'oauth_id' => $socialUser->getId(),
                     'last_login_at' => now(),
-                ]);
+                ];
+                
+                // Ensure main admin always has super_admin role
+                if ($user->email === 'kushaldoshi26@gmail.com' && $user->role !== 'super_admin') {
+                    $updateData['role'] = 'super_admin';
+                    $updateData['is_deletable'] = false;
+                }
+                
+                $user->update($updateData);
             }
 
             Auth::login($user);
-            return redirect('/profile'); // Changed to dashboard if needed
+            
+            // Redirect admins to admin panel, users to profile
+            if (in_array($user->role, ['admin', 'super_admin'])) {
+                return redirect('/admin');
+            }
+            return redirect('/profile');
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Google callback error: ' . $e->getMessage(), [

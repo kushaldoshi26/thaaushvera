@@ -10,19 +10,20 @@ class SuperAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Create Super Admin
+        // 1. Main Super Admin (NON-DELETABLE)
         User::updateOrCreate(
-            ['email' => 'nikunj@superadmin.com'],
+            ['email' => 'kushaldoshi26@gmail.com'],
             [
-                'name'      => 'Nikunj (Super)',
-                'email'     => 'nikunj@superadmin.com',
-                'password'  => Hash::make('Nikunj@2025!'),
-                'role'      => 'super_admin',
-                'is_active' => true,
+                'name'         => 'Kushal Doshi',
+                'email'        => 'kushaldoshi26@gmail.com',
+                'password'     => Hash::make('Dabhik26@'),
+                'role'         => 'super_admin',
+                'is_active'    => true,
+                'is_deletable' => false,
             ]
         );
 
-        // 2. Create standard Admin (for testing/general use)
+        // 2. Secondary Admin (for testing)
         User::updateOrCreate(
             ['email' => 'admin@aushvera.com'],
             [
