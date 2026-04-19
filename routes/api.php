@@ -208,6 +208,13 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     // Category management
     Route::apiResource('categories', CategoryController::class)->except(['show']);
 
+    // Coupon management
+    Route::get('/coupons', [CouponController::class, 'index']);
+    Route::post('/coupons', [CouponController::class, 'store']);
+    Route::put('/coupons/{id}', [CouponController::class, 'update']);
+    Route::delete('/coupons/{id}', [CouponController::class, 'destroy']);
+    Route::put('/coupons/{id}/toggle', [CouponController::class, 'toggle']);
+
     // Subscription offers (Marketing)
     Route::apiResource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class);
 

@@ -150,11 +150,36 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::where('role', 'user')
-            ->withCount('orders')
+        $users = User::withCount('orders')
             ->latest()
-            ->get();
-        return response()->json(['users' => $users]);
+            ->get()
+            ->map(function($user) {
+                return [
+                    'id'          => $user->id,
+                    'name'        => $user->name,
+                    'email'       => $user->email,
+                    'phone'       => $user->phone,
+                    'role'        => $user->role,
+                    'role_label'  => match($user->role) {
+                        'super_admin' => 'Super Admin',
+                        'admin'       => 'Admin',
+                        default       => 'Customer',
+                    },
+                    'is_active'   => $user->is_active,
+                    'orders_count'=> $user->orders_count,
+                    'created_at'  => $user->created_at,
+                    'last_login_at' => $user->last_login_at,
+                ];
+            });
+
+        // Summary counts
+        $summary = [
+            'total'       => $users->count(),
+            'customers'   => $users->where('role', 'user')->count(),
+            'admins'      => $users->whereIn('role', ['admin', 'super_admin'])->count(),
+        ];
+
+        return response()->json(['users' => $users, 'summary' => $summary]);
     }
 
     public function getUser($id)
@@ -357,6 +382,19 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function getOrder($id)
+    {
+        return $this->showOrder($id);
+    }
+
+    public function updateOrderStatus(Request $request, $id)
+    {
+        $request->validate(['status' => 'required|in:pending,processing,shipped,delivered,cancelled']);
+        $order = \App\Models\Order::findOrFail($id);
+        $order->update(['status' => $request->status]);
+        return response()->json(['success' => true, 'message' => 'Order status updated', 'data' => $order]);
     }
 
 }

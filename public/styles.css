@@ -275,6 +275,7 @@ nav {
     height: 100%;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
+    overflow: hidden;
 }
 
 .banner-slide.active {
@@ -283,9 +284,10 @@ nav {
 
 .banner-slide img {
     width: 100%;
-    height: 600px;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
     object-position: center;
+    display: block;
 }
 
 .hero-content {

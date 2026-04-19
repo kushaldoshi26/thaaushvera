@@ -73,7 +73,17 @@
                 </button>
                 <div class="topbar-title">@yield('title', 'Dashboard')</div>
                 <div class="topbar-actions">
-                    <span class="topbar-admin">Admin Panel</span>
+                    <span class="topbar-admin">
+                        {{ Auth::user()->name ?? 'Admin' }}
+                        <small style="display:block;font-size:10px;opacity:0.6;text-transform:uppercase;letter-spacing:1px;">{{ Auth::user()->role ?? 'admin' }}</small>
+                    </span>
+                    <form method="POST" action="{{ route('admin.logout') }}" style="margin:0;">
+                        @csrf
+                        <button type="submit" class="topbar-logout-btn" title="Logout">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </header>
             <main class="admin-main">
@@ -88,6 +98,28 @@
         </div>
     </div>
 
+    <style>
+    .topbar-logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: 'Inter', sans-serif;
+    }
+    .topbar-logout-btn:hover {
+        background: rgba(220,53,69,0.8);
+        border-color: transparent;
+    }
+    .topbar-actions { display:flex; align-items:center; gap:16px; }
+    .topbar-admin { color:rgba(255,255,255,0.8); font-size:13px; }
+    </style>
     <script>
         // Inject session token into localStorage so API calls work after web login
         @if(session('admin_token'))

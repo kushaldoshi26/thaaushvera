@@ -55,5 +55,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/categories', [WebController::class, 'adminCategories'])->name('categories');
     Route::get('/coupons', [WebController::class, 'adminCoupons'])->name('coupons');
     Route::get('/register', [WebController::class, 'adminRegister'])->name('register');
+    Route::post('/logout', function() {
+        // Clear admin token from session
+        session()->forget('admin_token');
+        Auth::logout();
+        return redirect()->route('admin.login')->with('success', 'You have been logged out.');
+    })->name('logout');
 
 });
