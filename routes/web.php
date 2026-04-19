@@ -58,10 +58,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/subscriptions', [\App\Http\Controllers\WebController::class, 'adminSubscriptions'])->name('subscriptions');
         Route::get('/emails', [\App\Http\Controllers\WebController::class, 'adminEmails'])->name('emails');
         Route::get('/register', [\App\Http\Controllers\WebController::class, 'adminRegister'])->name('register');
-        Route::post('/logout', function () {
-            session()->forget('admin_token');
-            \Illuminate\Support\Facades\Auth::logout();
-            return redirect()->route('admin.login')->with('success', 'You have been logged out.');
-        })->name('logout');
+        Route::post('/logout', [\App\Http\Controllers\WebController::class, 'adminLogout'])->name('logout');
     });
 });

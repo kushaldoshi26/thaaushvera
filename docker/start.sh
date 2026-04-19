@@ -95,10 +95,16 @@ echo "Seeding sample products..."
 php artisan db:seed --class=ProductSeeder --force 2>&1 || echo "Seeder note: products may already exist"
 
 # ─── Cache for performance ───────────────────────────────────────────────────
-echo "Caching config and routes..."
+echo "Clearing old caches..."
+php artisan config:clear 2>&1 || true
+php artisan route:clear  2>&1 || true
+php artisan view:clear   2>&1 || true
+
+echo "Caching config and views..."
 php artisan config:cache 2>&1 || true
-php artisan route:cache  2>&1 || true
 php artisan view:cache   2>&1 || true
+# Note: route:cache is skipped if closures exist in routes files
+php artisan route:cache  2>&1 || echo "Route caching skipped (closures in routes)"
 
 echo "=== Starting Apache ==="
 exec apache2-foreground

@@ -112,8 +112,12 @@ class WebController extends Controller
 
     public function profile()
     {
-        $user = auth()->user();
-        return view('frontend.profile', compact('user'));
+        try {
+            $user = auth()->user();
+        } catch (\Exception $e) {
+            $user = null;
+        }
+        return view('frontend.profile', ['user' => $user]);
     }
 
     public function terms()
@@ -177,5 +181,12 @@ class WebController extends Controller
     public function adminRegister()
     {
         return view('admin.register');
+    }
+
+    public function adminLogout()
+    {
+        session()->forget('admin_token');
+        \Illuminate\Support\Facades\Auth::logout();
+        return redirect()->route('admin.login')->with('success', 'You have been logged out.');
     }
 }
