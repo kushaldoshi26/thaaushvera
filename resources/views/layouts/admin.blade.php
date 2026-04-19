@@ -15,10 +15,15 @@
 @php
     $me = Auth::user();
     $role = $me->role ?? 'user';
-    $level = $me->admin_level ?? ($role === 'super_admin' ? 'super' : 'staff');
+    // Safely get admin_level even if column doesn't exist yet
+    try {
+        $level = $me->admin_level ?? ($role === 'super_admin' ? 'super' : ($role === 'admin' ? 'manager' : 'staff'));
+    } catch (\Exception $e) {
+        $level = $role === 'super_admin' ? 'super' : ($role === 'admin' ? 'manager' : 'staff');
+    }
     $isSuper   = $role === 'super_admin';
     $isManager = $isSuper || $level === 'manager';
-    $isStaff   = $isManager || $level === 'staff'; // staff can view but limited
+    $isStaff   = $isManager || $level === 'staff';
 @endphp
 
 <div class="admin-layout">
