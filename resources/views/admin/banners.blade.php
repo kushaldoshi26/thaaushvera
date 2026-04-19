@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Banners')
-@section('page-title', 'Banner Management')
 
 @section('header-actions')
 <button class="bg-green-600" onclick="openAddModal()">+ Add Banner</button>

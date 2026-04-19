@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Analytics')
-@section('page-title', 'Analytics & Reports')
 
 @section('content')
 <div class="admin-card" style="margin-bottom:24px;">

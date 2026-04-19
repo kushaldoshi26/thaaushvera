@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Subscriptions')
-@section('page-title', 'Subscription Offers')
 
 @section('header-actions')
 <button onclick="openAddSubscriptionModal()" style="background:#059669;color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:500;">+ Add Subscription Offer</button>

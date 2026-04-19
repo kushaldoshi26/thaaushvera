@@ -136,6 +136,7 @@
             closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
         }
     </script>
+    <script src="{{ asset('assets/js/api-config.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Pricing')
-@section('page-title', 'Pricing Management')
 
 @section('content')
 <div class="admin-card">

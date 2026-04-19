@@ -1,8 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Categories')
-@section('page-title', 'Categories Management')
-
-
 
 @section('content')
 <div class="page-bar">

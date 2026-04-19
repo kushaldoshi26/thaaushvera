@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Inventory')
-@section('page-title', 'Inventory Management')
 
 @section('content')
 <div class="admin-card">
