@@ -236,20 +236,16 @@
                 </form>
             </div>
             
-            <div class="info-card">
+            {{-- ─── Membership / Subscription Card ─── --}}
+            <div class="info-card" id="subscriptionCard">
                 <div class="card-header">
-                    <h3>Membership Status</h3>
-                    <span class="status-badge">Premium</span>
+                    <h3>Membership & Subscription</h3>
+                    <span class="status-badge" id="subBadge" style="display:none;">Active</span>
                 </div>
-                <div class="card-content">
-                    <div class="membership-info">
-                        <p class="membership-text">You are a valued member of the Aushvera wellness community.</p>
-                        <div class="membership-benefits">
-                            <span class="benefit-item">• Exclusive access to new releases</span>
-                            <span class="benefit-item">• Priority customer support</span>
-                            <span class="benefit-item">• Special ritual guides</span>
-                        </div>
-                    </div>
+                <div class="card-content" id="subscriptionContent">
+                    <p style="color: rgba(255,255,255,0.5); font-size:14px; text-align:center; padding:1rem 0;">
+                        Loading subscription info...
+                    </p>
                 </div>
             </div>
         </div>
@@ -423,4 +419,204 @@
     }
 </script>
 <script src="{{ asset('profile-auth.js') }}"></script>
+<script>
+// ── Subscription System ──────────────────────────────────────────────────────
+const SUB_CONTENT = document.getElementById('subscriptionContent');
+const SUB_BADGE   = document.getElementById('subBadge');
+
+function getToken() {
+    return localStorage.getItem('auth_token');
+}
+
+function authHeader() {
+    const t = getToken();
+    return t ? { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json', 'Accept': 'application/json' } : { 'Accept': 'application/json' };
+}
+
+// Render "no subscription" state with available plans
+function renderPlans(plans) {
+    if (!plans || plans.length === 0) {
+        SUB_CONTENT.innerHTML = `
+            <div class="membership-info">
+                <p class="membership-text" style="opacity:0.7;">You don't have an active subscription yet.</p>
+                <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:8px;">No plans available right now. Check back later!</p>
+            </div>`;
+        return;
+    }
+    SUB_CONTENT.innerHTML = `
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:1rem;">Choose a plan to unlock exclusive benefits:</p>
+        <div style="display:flex;flex-direction:column;gap:12px;" id="plansList">
+            ${plans.map(p => `
+                <div style="border:1px solid rgba(184,150,76,0.3);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(184,150,76,0.05);">
+                    <div>
+                        <div style="font-weight:600;color:var(--cream, #f7f4ee);font-size:15px;">${p.name}</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;">${p.description || ''}</div>
+                        <div style="font-size:13px;color:#B8964C;margin-top:4px;">
+                            ₹${parseFloat(p.price).toFixed(2)} · ${p.duration_months} month${p.duration_months > 1 ? 's' : ''}
+                        </div>
+                    </div>
+                    <button onclick="subscribeToPlan(${p.id}, '${p.name.replace(/'/g,"\\'")}', ${p.price})"
+                        style="background:linear-gradient(135deg,#B8964C,#d4a85a);color:#0b1c2d;border:none;padding:9px 18px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;transition:opacity 0.2s;"
+                        onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                        Subscribe
+                    </button>
+                </div>
+            `).join('')}
+        </div>`;
+}
+
+// Render active subscription
+function renderActiveSubscription(sub) {
+    SUB_BADGE.style.display = '';
+    SUB_BADGE.textContent   = '✓ Active';
+    SUB_BADGE.style.background = 'rgba(16,185,129,0.15)';
+    SUB_BADGE.style.color = '#10b981';
+    SUB_BADGE.style.border = '1px solid rgba(16,185,129,0.3)';
+
+    SUB_CONTENT.innerHTML = `
+        <div class="membership-info">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(184,150,76,0.2),rgba(184,150,76,0.05));display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid rgba(184,150,76,0.2);">👑</div>
+                <div>
+                    <div style="font-weight:700;font-size:16px;color:var(--cream,#f7f4ee);">${sub.plan_name}</div>
+                    <div style="font-size:12px;color:#B8964C;font-weight:500;">Premium Member</div>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;">
+                <div style="background:rgba(255,255,255,0.04);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;">Started</div>
+                    <div style="font-size:13px;color:var(--cream,#f7f4ee);margin-top:3px;font-weight:500;">${sub.starts_at}</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.04);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;">Expires</div>
+                    <div style="font-size:13px;color:var(--cream,#f7f4ee);margin-top:3px;font-weight:500;">${sub.ends_at}</div>
+                </div>
+            </div>
+            <div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);border-radius:8px;padding:12px;margin-bottom:1rem;">
+                <div style="font-size:12px;color:#10b981;font-weight:600;margin-bottom:8px;">🎯 Your Benefits</div>
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                    <span style="font-size:13px;color:rgba(255,255,255,0.7);">✦ Exclusive access to new launches</span>
+                    <span style="font-size:13px;color:rgba(255,255,255,0.7);">✦ Priority customer support</span>
+                    <span style="font-size:13px;color:rgba(255,255,255,0.7);">✦ Special Ayurvedic ritual guides</span>
+                    <span style="font-size:13px;color:rgba(255,255,255,0.7);">✦ Members-only discounts</span>
+                </div>
+            </div>
+            <button onclick="cancelSubscription()"
+                style="border:1px solid rgba(239,68,68,0.4);background:transparent;color:#ef4444;padding:8px 18px;border-radius:7px;cursor:pointer;font-size:13px;transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">
+                Cancel Subscription
+            </button>
+        </div>`;
+}
+
+// Render "not logged in" state
+function renderLoginRequired() {
+    SUB_CONTENT.innerHTML = `
+        <div class="membership-info" style="text-align:center;padding:1rem 0;">
+            <p class="membership-text" style="opacity:0.7;">Please log in to manage your subscription.</p>
+            <button onclick="document.getElementById('loginModal').classList.add('active')"
+                style="margin-top:12px;background:linear-gradient(135deg,#B8964C,#d4a85a);color:#0b1c2d;border:none;padding:10px 24px;border-radius:7px;font-weight:700;cursor:pointer;">
+                Login to Subscribe
+            </button>
+        </div>`;
+}
+
+// Load subscription data
+async function loadSubscriptionData() {
+    const token = getToken();
+
+    if (!token || token === 'session_auth') {
+        // Try loading plans to show available options
+        try {
+            const res = await fetch('/api/subscription-plans');
+            const json = await res.json();
+            if (token === 'session_auth') {
+                // Logged in via session, try to get my subscription
+                await loadMySubscription();
+            } else {
+                renderLoginRequired();
+            }
+        } catch(e) {
+            renderLoginRequired();
+        }
+        return;
+    }
+
+    await loadMySubscription();
+}
+
+async function loadMySubscription() {
+    try {
+        const [subRes, planRes] = await Promise.all([
+            fetch('/api/my-subscription', { headers: authHeader() }),
+            fetch('/api/subscription-plans')
+        ]);
+        const subJson  = await subRes.json();
+        const planJson = await planRes.json();
+        const plans    = planJson.data || [];
+
+        if (subRes.ok && subJson.has_subscription) {
+            renderActiveSubscription(subJson.subscription);
+        } else {
+            SUB_BADGE.style.display = 'none';
+            renderPlans(plans);
+        }
+    } catch (e) {
+        SUB_CONTENT.innerHTML = '<p style="color:#ef4444;font-size:13px;text-align:center;padding:1rem;">Error loading subscription data</p>';
+    }
+}
+
+async function subscribeToPlan(planId, planName, price) {
+    const token = getToken();
+    if (!token || token === 'session_auth') {
+        alert('Please log in with your account credentials to subscribe to a plan.');
+        document.getElementById('loginModal')?.classList.add('active');
+        return;
+    }
+    if (!confirm(`Subscribe to "${planName}" for ₹${parseFloat(price).toFixed(2)}?`)) return;
+
+    try {
+        const res = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({ subscription_id: planId })
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+            alert('🎉 ' + json.message);
+            await loadMySubscription();
+        } else {
+            alert('Failed: ' + (json.message || 'Unknown error'));
+        }
+    } catch(e) {
+        alert('Network error. Please try again.');
+    }
+}
+
+async function cancelSubscription() {
+    if (!confirm('Are you sure you want to cancel your subscription? You will lose access to premium benefits.')) return;
+
+    try {
+        const res = await fetch('/api/subscription/cancel', {
+            method: 'POST',
+            headers: authHeader()
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+            alert(json.message);
+            SUB_BADGE.style.display = 'none';
+            await loadMySubscription();
+        } else {
+            alert('Failed: ' + (json.message || 'Error'));
+        }
+    } catch(e) {
+        alert('Network error.');
+    }
+}
+
+// Auto-load when page is ready
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadSubscriptionData, 300); // slight delay so auth token is set
+});
+</script>
 @endpush

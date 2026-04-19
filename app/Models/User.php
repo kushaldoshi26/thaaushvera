@@ -82,6 +82,21 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)
+            ->where('status', 'active')
+            ->where(function($q) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
+            })
+            ->latest();
+    }
+
     // role helpers
     public function isSuperAdmin()
     {

@@ -146,6 +146,9 @@ Route::get('/products/{id}/reviews', [ReviewController::class, 'getProductReview
 // Public category routes
 Route::get('/categories', [CategoryController::class, 'index']);
 
+// Public subscription plans
+Route::get('/subscription-plans', [\App\Http\Controllers\UserSubscriptionController::class, 'plans']);
+
 // Protected routes (require auth:sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
@@ -177,6 +180,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Review routes
     Route::post('/reviews', [ReviewController::class, 'store']);
+
+    // Subscription routes
+    Route::get('/my-subscription', [\App\Http\Controllers\UserSubscriptionController::class, 'mySubscription']);
+    Route::post('/subscribe', [\App\Http\Controllers\UserSubscriptionController::class, 'subscribe']);
+    Route::post('/subscription/cancel', [\App\Http\Controllers\UserSubscriptionController::class, 'cancel']);
+    Route::get('/subscription/history', [\App\Http\Controllers\UserSubscriptionController::class, 'history']);
 });
 
 // Protected admin routes (require auth:sanctum + admin role)
