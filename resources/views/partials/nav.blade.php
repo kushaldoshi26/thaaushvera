@@ -1,6 +1,6 @@
 <nav class="nav-home" id="siteNav">
     <div class="nav-container">
-        <!-- Left Links -->
+        <!-- Left Links (desktop only) -->
         <div class="nav-left">
             <ul class="nav-links">
                 <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">HOME</a></li>
@@ -15,7 +15,7 @@
             <span>AUSHVERA</span>
         </a>
 
-        <!-- Right Links -->
+        <!-- Right Links + Icons -->
         <div class="nav-right">
             <ul class="nav-links">
                 <li><a href="{{ route('products') }}" class="{{ request()->routeIs('products') ? 'active' : '' }}">PRODUCT</a></li>
@@ -38,12 +38,11 @@
                     <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
                 </svg>
             </a>
+            <!-- Mobile burger (inside nav-right so it stays on the right) -->
+            <button class="nav-burger" id="navBurger" aria-label="Open Menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
-
-        <!-- Mobile burger -->
-        <button class="nav-burger" id="navBurger" aria-label="Open Menu">
-            <span></span><span></span><span></span>
-        </button>
     </div>
 
     <!-- Mobile Drawer -->

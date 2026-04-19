@@ -3172,14 +3172,21 @@ footer::before {
 }
 
 @media (max-width: 900px) {
+    /* ── Container: relative so logo can be absolutely centered ── */
     .nav-container {
         display: flex !important;
         align-items: center;
-        justify-content: flex-end !important;
         position: relative;
-        padding: 0.8rem 1rem !important;
-        height: 70px !important;
+        padding: 0 1rem !important;
+        height: 64px !important;
+        gap: 0 !important;
     }
+
+    /* Hide desktop-only nav sections */
+    .nav-left { display: none !important; }
+    .nav-right .nav-links { display: none !important; }
+
+    /* Logo + Brand: perfectly centered */
     .nav-center {
         position: absolute !important;
         left: 50% !important;
@@ -3187,29 +3194,31 @@ footer::before {
         transform: translate(-50%, -50%) !important;
         display: flex !important;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         pointer-events: auto !important;
-        margin: 0 !important;
-        order: -1;
+        z-index: 10;
+        white-space: nowrap;
     }
     .nav-center span {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
         letter-spacing: 2px !important;
         font-weight: 700 !important;
     }
     .nav-logo {
-        width: 32px !important;
-        height: 32px !important;
+        width: 30px !important;
+        height: 30px !important;
     }
-    .nav-left { display: none !important; }
+
+    /* Right group: Cart + Profile + Burger floated right */
     .nav-right {
         display: flex !important;
         align-items: center;
-        gap: 12px !important;
-        margin-right: 8px !important;
+        gap: 14px !important;
+        margin-left: auto !important;
+        z-index: 5;
     }
-    .nav-right .nav-links { display: none !important; }
-    
+
+    /* Burger: gold lines */
     .nav-burger {
         display: flex !important;
         flex-direction: column;
@@ -3218,7 +3227,7 @@ footer::before {
         border: none;
         cursor: pointer;
         padding: 5px;
-        margin-left: 5px;
+        margin-left: 2px;
     }
     .nav-burger span {
         display: block;
@@ -3226,12 +3235,25 @@ footer::before {
         height: 2px;
         background-color: #B8964C !important;
         border-radius: 2px;
+        transition: 0.3s;
     }
 
-    /* Banner/Hero fix for mobile logo centering */
+    /* Hero: clear the 64px nav */
     .hero {
-        margin-top: 70px !important;
-        padding-top: 2rem !important;
+        margin-top: 64px !important;
+        padding: 2rem 1.5rem !important;
+        min-height: 380px;
+        max-height: 520px;
+        align-items: center;
+        justify-content: center;
+    }
+    .hero-content { margin-top: 0; width: 100%; }
+    .hero-text { text-align: center; max-width: 100%; }
+    .hero h1, .hero-text h1 {
+        font-size: 26px !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+        margin: 8px 0 !important;
     }
 }
 
