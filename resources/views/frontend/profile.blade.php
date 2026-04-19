@@ -336,7 +336,7 @@
     // Handle server-side authenticated user (from OAuth flow)
     @if($user ?? null)
         (function() {
-            const serverUser = @json($user);
+            const serverUser = @json($user ?? []);
             if (serverUser && serverUser.id) {
                 localStorage.setItem('auth_token', 'session_auth');
                 localStorage.setItem('currentUser', JSON.stringify(serverUser));

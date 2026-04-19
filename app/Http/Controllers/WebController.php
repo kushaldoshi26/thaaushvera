@@ -97,7 +97,11 @@ class WebController extends Controller
             return view('frontend.product', compact('product', 'related'));
         }
 
-        $products = Product::active()->with('category')->latest()->take(4)->get();
+        try {
+            $products = Product::active()->with('category')->latest()->take(4)->get();
+        } catch (\Exception $e) {
+            $products = Product::with('category')->latest()->take(4)->get();
+        }
         return view('frontend.product', compact('products'));
     }
 

@@ -89,12 +89,16 @@ class User extends Authenticatable
 
     public function activeSubscription()
     {
-        return $this->hasOne(UserSubscription::class)
-            ->where('status', 'active')
-            ->where(function($q) {
-                $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
-            })
-            ->latest();
+        try {
+            return $this->hasOne(UserSubscription::class)
+                ->where('status', 'active')
+                ->where(function($q) {
+                    $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
+                })
+                ->latest();
+        } catch (\Exception $e) {
+            return $this->hasOne(UserSubscription::class)->whereRaw('1 = 0'); // empty result
+        }
     }
 
     // role helpers
