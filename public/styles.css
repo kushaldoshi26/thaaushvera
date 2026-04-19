@@ -193,7 +193,8 @@ nav {
 
 /* Hero Section */
 .hero {
-    min-height: 650px;
+    min-height: 85vh;
+    max-height: 900px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -1125,7 +1126,8 @@ footer::before {
     
     .hero {
         padding: 4rem 2rem;
-        height: 600px;
+        min-height: 70vh;
+        max-height: 800px;
         margin-top: 70px;
     }
     
@@ -1250,7 +1252,8 @@ footer::before {
     
     .hero {
         padding: 3rem 1.5rem;
-        height: 500px;
+        min-height: 60vh;
+        max-height: none;
         margin-top: 60px;
     }
     
@@ -3258,12 +3261,12 @@ footer::before {
         transition: 0.3s;
     }
 
-    /* Hero: clear the 64px nav */
+    /* Hero: mobile-optimized banner */
     .hero {
         margin-top: 64px !important;
         padding: 2rem 1.5rem !important;
-        min-height: 380px;
-        max-height: 520px;
+        min-height: 55vh;
+        max-height: none;
         align-items: center;
         justify-content: center;
     }
@@ -3278,13 +3281,29 @@ footer::before {
 }
 
 /* =====================================================
-   BANNER SLIDE IMAGE — full-cover for hero
+   BANNER SLIDE IMAGE — proper full-cover for hero
    ===================================================== */
 .banner-slide img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    object-position: center !important;
+    object-position: center top !important;
+}
+
+/* Ensure banner fills the hero area properly on all viewports */
+@media (max-width: 768px) {
+    .banner-slider::before {
+        background: linear-gradient(180deg,
+            rgba(11, 28, 45, 0.85) 0%,
+            rgba(11, 28, 45, 0.6) 40%,
+            rgba(11, 28, 45, 0.4) 100%) !important;
+    }
+    .banner-slide img {
+        object-position: center center !important;
+    }
+    .hero::after {
+        display: none;
+    }
 }
 
 /* =====================================================

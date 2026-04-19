@@ -256,14 +256,20 @@
 <div id="loginModal" class="auth-modal">
     <div class="modal-content">
         <span class="close-modal" id="closeLogin">&times;</span>
+        <div class="modal-logo" style="text-align:center;margin-bottom:8px;">
+            <img src="{{ asset('assets/img/logo.png') }}" alt="AUSHVERA" style="width:50px;height:50px;margin:0 auto;display:block;" onerror="this.style.display='none'">
+        </div>
         <h2>Welcome Back</h2>
-        <p class="modal-subtitle">Sign in to your Aushvera account</p>
+        <p class="modal-subtitle">Sign in to your Aushvera account<br><small style="color:#B8964C;font-size:11px;">Works for both Admin & User accounts</small></p>
         <form class="auth-form" id="loginForm">
             <input type="email" id="loginEmail" placeholder="Email Address" required>
             <input type="password" id="loginPassword" placeholder="Password" required>
             <button type="submit" class="auth-btn">Sign In</button>
         </form>
-        
+        <div style="text-align:center;margin:12px 0 4px;">
+            <a href="#" id="showForgotPassword" style="color:#B8964C;font-size:13px;text-decoration:none;">Forgot Password?</a>
+        </div>
+
         <div class="social-login-separator">
             <span>Or continue with</span>
         </div>
@@ -277,8 +283,48 @@
                 Facebook
             </a>
         </div>
-        
+
         <p class="switch-auth" style="margin-top: 0;">Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+    </div>
+</div>
+
+{{-- ── Forgot Password Modal ─────────────────────────────── --}}
+<div id="forgotModal" class="auth-modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeForgot">&times;</span>
+        <h2>Reset Password</h2>
+        <p class="modal-subtitle">We'll send an OTP to your email</p>
+
+        {{-- Step 1: Enter email --}}
+        <div id="forgotStep1">
+            <form class="auth-form" id="forgotEmailForm">
+                <input type="email" id="forgotEmail" placeholder="Enter your email address" required>
+                <button type="submit" class="auth-btn" id="sendOtpBtn">Send OTP</button>
+            </form>
+        </div>
+
+        {{-- Step 2: Verify OTP --}}
+        <div id="forgotStep2" style="display:none;">
+            <p style="color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:12px;text-align:center;">OTP sent to <strong id="forgotEmailDisplay" style="color:#B8964C;"></strong></p>
+            <form class="auth-form" id="verifyOtpForm">
+                <input type="text" id="forgotOtp" placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}" required style="letter-spacing:8px;text-align:center;font-size:20px;font-family:monospace;">
+                <button type="submit" class="auth-btn">Verify OTP</button>
+            </form>
+            <div style="text-align:center;margin-top:10px;">
+                <a href="#" id="resendOtpLink" style="color:#B8964C;font-size:12px;text-decoration:none;">Resend OTP</a>
+            </div>
+        </div>
+
+        {{-- Step 3: New password --}}
+        <div id="forgotStep3" style="display:none;">
+            <form class="auth-form" id="newPasswordForm">
+                <input type="password" id="newPassword" placeholder="New Password (min 8 characters)" minlength="8" required>
+                <input type="password" id="confirmNewPassword" placeholder="Confirm New Password" minlength="8" required>
+                <button type="submit" class="auth-btn">Reset Password</button>
+            </form>
+        </div>
+
+        <p class="switch-auth" style="margin-top:16px;"><a href="#" id="backToLogin" style="color:#B8964C;">← Back to Login</a></p>
     </div>
 </div>
 

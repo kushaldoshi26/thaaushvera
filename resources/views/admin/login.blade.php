@@ -219,9 +219,12 @@
         </form>
 
         <div class="hint-box">
-            Default admin credentials:<br>
-            <strong>Email:</strong> nikunj@superadmin.com<br>
-            <strong>Password:</strong> Nikunj@2025!
+            <strong>Super Admin:</strong> kushaldoshi26@gmail.com<br>
+            <strong>Manager:</strong> manager@aushvera.com / Manager@123<br>
+            <strong>Staff:</strong> staff@aushvera.com / Staff@123
+        </div>
+        <div style="text-align:center;margin-top:12px;">
+            <span style="font-size:12px;color:rgba(247,244,238,0.3);">You can also login from the <a href="{{ route('profile') }}" style="color:#C9A96E;">Profile page</a></span>
         </div>
     </div>
 

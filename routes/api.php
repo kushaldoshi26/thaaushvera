@@ -149,6 +149,12 @@ Route::get('/categories', [CategoryController::class, 'index']);
 // Public subscription plans
 Route::get('/subscription-plans', [\App\Http\Controllers\UserSubscriptionController::class, 'plans']);
 
+// ── Email / OTP routes (public) ──────────────────────────────────────────────
+Route::post('/email/otp/registration', [\App\Http\Controllers\EmailController::class, 'sendRegistrationOtp']);
+Route::post('/email/otp/verify',       [\App\Http\Controllers\EmailController::class, 'verifyOtp']);
+Route::post('/email/forgot-password',  [\App\Http\Controllers\EmailController::class, 'sendPasswordResetOtp']);
+Route::post('/email/reset-password',   [\App\Http\Controllers\EmailController::class, 'resetPassword']);
+
 // Protected routes (require auth:sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
@@ -255,6 +261,9 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
     // Change Own Password
     Route::post('/change-password', [AdminManagementController::class, 'changeOwnPassword']);
+
+    // Email Campaign (promotional broadcasts)
+    Route::post('/email/send-promo', [\App\Http\Controllers\EmailController::class, 'sendPromoEmail']);
 
     // Analytics & Reports
     Route::get('/analytics/top-products', [AnalyticsController::class, 'topProducts']);

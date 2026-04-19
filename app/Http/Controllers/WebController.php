@@ -169,6 +169,11 @@ class WebController extends Controller
         return view('admin.subscriptions');
     }
 
+    public function adminEmails()
+    {
+        return view('admin.emails');
+    }
+
     public function adminRegister()
     {
         return view('admin.register');

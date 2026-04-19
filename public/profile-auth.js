@@ -301,3 +301,157 @@ signupForm.addEventListener('submit', async (e) => {
         alert(error.message || 'Registration failed');
     }
 });
+
+// ── Forgot Password Flow ─────────────────────────────────────────────────────
+const forgotModal   = document.getElementById('forgotModal');
+const closeForgot   = document.getElementById('closeForgot');
+const showForgotPw  = document.getElementById('showForgotPassword');
+const backToLogin   = document.getElementById('backToLogin');
+
+let resetEmail = '';
+let resetOtp   = '';
+
+// Show forgot password modal
+if (showForgotPw) {
+    showForgotPw.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.classList.remove('active');
+        forgotModal.classList.add('active');
+        // Reset to step 1
+        document.getElementById('forgotStep1').style.display = '';
+        document.getElementById('forgotStep2').style.display = 'none';
+        document.getElementById('forgotStep3').style.display = 'none';
+    });
+}
+
+// Close forgot modal
+if (closeForgot) {
+    closeForgot.addEventListener('click', () => forgotModal.classList.remove('active'));
+}
+
+// Back to login
+if (backToLogin) {
+    backToLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        forgotModal.classList.remove('active');
+        loginModal.classList.add('active');
+    });
+}
+
+// Step 1: Send OTP
+const forgotEmailForm = document.getElementById('forgotEmailForm');
+if (forgotEmailForm) {
+    forgotEmailForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        resetEmail = document.getElementById('forgotEmail').value.trim();
+        const btn = document.getElementById('sendOtpBtn');
+        btn.disabled = true; btn.textContent = 'Sending...';
+
+        try {
+            const res = await fetch('/api/email/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email: resetEmail })
+            });
+            const json = await res.json();
+            document.getElementById('forgotEmailDisplay').textContent = resetEmail;
+            document.getElementById('forgotStep1').style.display = 'none';
+            document.getElementById('forgotStep2').style.display = '';
+            alert(json.message || 'OTP sent to your email!');
+        } catch (err) {
+            alert('Failed to send OTP. Please try again.');
+        }
+        btn.disabled = false; btn.textContent = 'Send OTP';
+    });
+}
+
+// Step 2: Verify OTP
+const verifyOtpForm = document.getElementById('verifyOtpForm');
+if (verifyOtpForm) {
+    verifyOtpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        resetOtp = document.getElementById('forgotOtp').value.trim();
+
+        try {
+            const res = await fetch('/api/email/otp/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email: resetEmail, otp: resetOtp, purpose: 'reset' })
+            });
+            const json = await res.json();
+            if (json.success) {
+                document.getElementById('forgotStep2').style.display = 'none';
+                document.getElementById('forgotStep3').style.display = '';
+            } else {
+                alert(json.message || 'Invalid OTP');
+            }
+        } catch (err) {
+            alert('Failed to verify OTP.');
+        }
+    });
+}
+
+// Resend OTP
+const resendOtpLink = document.getElementById('resendOtpLink');
+if (resendOtpLink) {
+    resendOtpLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            await fetch('/api/email/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email: resetEmail })
+            });
+            alert('OTP resent!');
+        } catch (err) {
+            alert('Failed to resend OTP.');
+        }
+    });
+}
+
+// Step 3: Set new password
+const newPasswordForm = document.getElementById('newPasswordForm');
+if (newPasswordForm) {
+    newPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pw  = document.getElementById('newPassword').value;
+        const cpw = document.getElementById('confirmNewPassword').value;
+
+        if (pw !== cpw) {
+            alert('Passwords do not match!');
+            return;
+        }
+        if (pw.length < 8) {
+            alert('Password must be at least 8 characters.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/email/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    email: resetEmail,
+                    otp: resetOtp,
+                    password: pw,
+                    password_confirmation: cpw
+                })
+            });
+            const json = await res.json();
+            if (json.success) {
+                alert('🎉 Password reset successfully! Please log in with your new password.');
+                forgotModal.classList.remove('active');
+                loginModal.classList.add('active');
+            } else {
+                alert(json.message || 'Failed to reset password.');
+            }
+        } catch (err) {
+            alert('Network error. Please try again.');
+        }
+    });
+}
+
+// Close forgot on outside click
+window.addEventListener('click', (e) => {
+    if (e.target === forgotModal) forgotModal.classList.remove('active');
+});
