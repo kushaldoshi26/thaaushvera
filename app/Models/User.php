@@ -43,6 +43,7 @@ class User extends Authenticatable
         'address',
         'oauth_provider',
         'oauth_id',
+        'admin_level',
     ];
 
     /**

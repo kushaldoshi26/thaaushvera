@@ -52,6 +52,7 @@ HTML;
         $ctaText = $this->cta_text;
         $ctaUrl = $this->cta_url;
         $headline = $this->headline;
+        $profileUrl = config('app.url') . '/profile';
 
         return <<<HTML
 <!DOCTYPE html>
@@ -116,7 +117,7 @@ HTML;
         <td style="background:#1a2f45;padding:28px 40px;text-align:center;">
           <p style="color:rgba(247,244,238,0.5);font-size:12px;margin:0 0 8px;">© 2025 AUSHVERA. All rights reserved.</p>
           <p style="color:rgba(247,244,238,0.3);font-size:11px;margin:0;">You received this email because you are registered with Aushvera.<br>
-          <a href="{url('/profile')}" style="color:#B8964C;">Manage preferences</a></p>
+          <a href="{$profileUrl}" style="color:#B8964C;">Manage preferences</a></p>
         </td>
       </tr>
     </table>
