@@ -113,7 +113,7 @@ class UserSubscriptionController extends Controller
     }
 
     /**
-     * Get all user subscriptions (history)
+     * Get logged-in user's subscription history
      */
     public function history(Request $request)
     {
@@ -129,7 +129,72 @@ class UserSubscriptionController extends Controller
                 'ends_at'   => $s->ends_at?->format('M d, Y') ?? 'Lifetime',
                 'paid'      => $s->amount_paid,
             ]);
+        return response()->json(['success' => true, 'data' => $subs]);
+    }
+
+    /**
+     * Get all user subscriptions (admin view) with optional status filter
+     */
+    public function adminList(Request $request)
+    {
+        $status = $request->query('status', 'active');
+
+        $query = UserSubscription::with(['user', 'plan'])->latest();
+
+        if ($status === 'active') {
+            $query->where('status', 'active')
+                  ->where(function($q) {
+                      $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
+                  });
+        } elseif ($status === 'expired') {
+            $query->where(function($q) {
+                $q->where('status', '!=', 'active')
+                  ->orWhere(function($q2) {
+                      $q2->where('status', 'active')->whereNotNull('ends_at')->where('ends_at', '<=', now());
+                  });
+            });
+        }
+
+        $subs = $query->get()->map(fn($s) => [
+            'id'          => $s->id,
+            'user_name'   => $s->user->name ?? '—',
+            'user_email'  => $s->user->email ?? '',
+            'plan_name'   => $s->plan->name ?? 'Unknown',
+            'starts_at'   => $s->starts_at?->format('M d, Y'),
+            'ends_at'     => $s->ends_at?->format('M d, Y'),
+            'ends_at_raw' => $s->ends_at?->toIso8601String(),
+            'status'      => $s->status,
+            'amount_paid' => $s->amount_paid,
+        ]);
 
         return response()->json(['success' => true, 'data' => $subs]);
+    }
+
+    /**
+     * Admin cancel a user subscription
+     */
+    public function adminCancel(Request $request, $id)
+    {
+        $sub = UserSubscription::findOrFail($id);
+        $sub->update(['status' => 'cancelled']);
+        return response()->json(['success' => true, 'message' => 'Subscription cancelled']);
+    }
+
+    /**
+     * Admin extend a user subscription by N months
+     */
+    public function adminExtend(Request $request, $id)
+    {
+        $request->validate(['months' => 'required|integer|min:1|max:24']);
+        $sub = UserSubscription::findOrFail($id);
+
+        $currentEnd = $sub->ends_at ?? now();
+        $newEnd = $currentEnd->addMonths($request->months);
+        $sub->update(['ends_at' => $newEnd, 'status' => 'active']);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Subscription extended to {$newEnd->format('M d, Y')}"
+        ]);
     }
 }

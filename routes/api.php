@@ -224,8 +224,13 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::delete('/coupons/{id}', [CouponController::class, 'destroy']);
     Route::put('/coupons/{id}/toggle', [CouponController::class, 'toggle']);
 
-    // Subscription offers (Marketing)
+    // Subscription plan management (admin CRUD)
     Route::apiResource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class);
+
+    // User subscription admin management
+    Route::get('/user-subscriptions', [\App\Http\Controllers\UserSubscriptionController::class, 'adminList']);
+    Route::post('/user-subscriptions/{id}/cancel', [\App\Http\Controllers\UserSubscriptionController::class, 'adminCancel']);
+    Route::post('/user-subscriptions/{id}/extend', [\App\Http\Controllers\UserSubscriptionController::class, 'adminExtend']);
 
     // Admin Management (Super Admin only)
     Route::prefix('admins')->group(function () {

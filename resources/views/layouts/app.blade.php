@@ -16,5 +16,7 @@
     </main>
     @include('partials.footer')
     @stack('scripts')
+    {{-- Veda AI Chatbot Widget --}}
+    <script src="{{ asset('assets/js/chatbot.js') }}" defer></script>
 </body>
 </html>

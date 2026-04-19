@@ -55,6 +55,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/reviews', [\App\Http\Controllers\WebController::class, 'adminReviews'])->name('reviews');
         Route::get('/categories', [\App\Http\Controllers\WebController::class, 'adminCategories'])->name('categories');
         Route::get('/coupons', [\App\Http\Controllers\WebController::class, 'adminCoupons'])->name('coupons');
+        Route::get('/subscriptions', [\App\Http\Controllers\WebController::class, 'adminSubscriptions'])->name('subscriptions');
         Route::get('/register', [\App\Http\Controllers\WebController::class, 'adminRegister'])->name('register');
         Route::post('/logout', function () {
             session()->forget('admin_token');
