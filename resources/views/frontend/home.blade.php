@@ -22,11 +22,11 @@
         <div class="hero-slide-content active">
             <div class="hero-text">
                 <div class="ornamental-divider">
-                    <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="width: 500px; height: auto;">
+                    <img src="{{ asset('assets/img/pattern.png') }}" alt="">
                 </div>
-                <h1>Discover The<br><span style="color: #B8964C; font-size: 72px; font-family: 'Playfair Display', serif; font-style: italic;">Healing Wisdom</span><br>of Ayurveda</h1>
+                <h1>Discover The<br><span class="hero-accent">Healing Wisdom</span><br>of Ayurveda</h1>
                 <div class="ornamental-divider">
-                    <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="width: 500px; height: auto; transform: scaleY(-1);">
+                    <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="transform: scaleY(-1);">
                 </div>
                 <a href="{{ route('products') }}" class="cta-primary" style="margin-top: 2rem;">SHOP NOW</a>
             </div>
@@ -34,18 +34,18 @@
         <div class="hero-slide-content">
             <div class="hero-text">
                 <div class="ornamental-divider">
-                    <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="width: 500px; height: auto;">
+                    <img src="{{ asset('assets/img/pattern.png') }}" alt="">
                 </div>
-                <h1>Embrace<br><span style="color: #B8964C; font-size: 72px; font-family: 'Playfair Display', serif; font-style: italic;">Ancient Rituals</span><br>for Modern Life</h1>
+                <h1>Embrace<br><span class="hero-accent">Ancient Rituals</span><br>for Modern Life</h1>
                 <div class="ornamental-divider">
-                    <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="width: 500px; height: auto; transform: scaleY(-1);">
+                    <img src="{{ asset('assets/img/pattern.png') }}" alt="" style="transform: scaleY(-1);">
                 </div>
                 <a href="{{ route('ritual') }}" class="cta-primary" style="margin-top: 2rem;">EXPLORE RITUALS</a>
             </div>
         </div>
         <div class="hero-slide-content">
             <div class="hero-text">
-                <h1 style="font-family: 'Cinzel', serif; font-size: 60px; color: var(--cream); letter-spacing: 0.05em; line-height: 1.1; margin-bottom: 32px;">Wellness,<br>Refined by Nature.</h1>
+                <h1 style="font-family: 'Cinzel', serif; color: var(--cream); letter-spacing: 0.05em; line-height: 1.1; margin-bottom: 32px;">Wellness,<br>Refined by Nature.</h1>
                 <p style="font-size: 16px; color: rgba(247, 244, 238, 0.75); font-weight: 300; line-height: 1.7; max-width: 550px; margin-bottom: 48px;">Rooted in ancient botanical wisdom, crafted for the modern world.</p>
                 <a href="{{ route('ritual') }}" class="cta-primary">Explore the Ritual</a>
             </div>

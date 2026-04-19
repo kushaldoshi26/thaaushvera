@@ -9,24 +9,26 @@ class CouponController extends Controller
 {
     public function index()
     {
-        return response()->json(Coupon::orderBy('created_at', 'desc')->get());
+        $coupons = Coupon::orderBy('created_at', 'desc')->get();
+        return response()->json(['success' => true, 'data' => $coupons]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'code' => 'required|string|unique:coupons,code',
-            'type' => 'required|in:percentage,fixed',
-            'value' => 'required|numeric|min:0',
+            'code'             => 'required|string|unique:coupons,code',
+            'type'             => 'required|in:percentage,fixed',
+            'value'            => 'required|numeric|min:0',
             'min_order_amount' => 'nullable|numeric|min:0',
-            'usage_limit' => 'nullable|integer|min:1',
-            'valid_from' => 'nullable|date',
-            'valid_until' => 'nullable|date|after:valid_from',
-            'is_active' => 'boolean'
+            'usage_limit'      => 'nullable|integer|min:1',
+            'valid_from'       => 'nullable|date',
+            'valid_until'      => 'nullable|date|after_or_equal:valid_from',
+            'is_active'        => 'sometimes|boolean'
         ]);
 
+        $validated['is_active'] = $validated['is_active'] ?? true;
         $coupon = Coupon::create($validated);
-        return response()->json($coupon, 201);
+        return response()->json(['success' => true, 'data' => $coupon], 201);
     }
 
     public function show($id)

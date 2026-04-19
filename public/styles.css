@@ -335,6 +335,25 @@ nav {
     text-align: left;
 }
 
+.hero-accent {
+    color: #B8964C;
+    font-size: 72px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    display: block;
+    line-height: 1;
+}
+
+@media (max-width: 900px) {
+    .hero-accent { font-size: 36px !important; }
+    .hero h1 { font-size: 30px !important; }
+}
+@media (max-width: 600px) {
+    .hero-accent { font-size: 28px !important; }
+    .hero h1 { font-size: 22px !important; }
+}
+
+
 .ornamental-divider {
     margin: 8px 0;
     display: flex;

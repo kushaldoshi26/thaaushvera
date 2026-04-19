@@ -7,7 +7,16 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Product extends Model
 {
-    protected $fillable = ['name', 'description', 'price', 'original_price', 'discount', 'image', 'display_images', 'stock', 'low_stock_threshold', 'track_inventory', 'category', 'category_id'];
+    protected $fillable = ['name', 'description', 'price', 'original_price', 'discount', 'image', 'display_images', 'stock', 'low_stock_threshold', 'track_inventory', 'category', 'category_id', 'is_active'];
+
+    protected $casts = [
+        'is_active'       => 'boolean',
+        'track_inventory' => 'boolean',
+        'price'           => 'float',
+        'original_price'  => 'float',
+        'stock'           => 'integer',
+    ];
+
 
     // ─── Relationships ───────────────────────────────────────────────────────
 

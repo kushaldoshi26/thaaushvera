@@ -40,26 +40,26 @@ Route::get('/auth/facebook/callback', [\App\Http\Controllers\SocialAuthControlle
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Login
+    // Login (public)
     Route::get('/login', [\App\Http\Controllers\AdminController::class, 'showLogin'])->name('login');
     Route::post('/login', [\App\Http\Controllers\AdminController::class, 'login'])
         ->name('login.post')
-        ->middleware('throttle:5,15');  // Max 5 login attempts per 15 minutes
+        ->middleware('throttle:5,15');
 
-    // Dashboard & core management
-    Route::get('/', [WebController::class, 'adminDashboard'])->name('dashboard');
-    Route::get('/products', [WebController::class, 'adminProducts'])->name('products');
-    Route::get('/orders', [WebController::class, 'adminOrders'])->name('orders');
-    Route::get('/users', [WebController::class, 'adminUsers'])->name('users');
-    Route::get('/reviews', [WebController::class, 'adminReviews'])->name('reviews');
-    Route::get('/categories', [WebController::class, 'adminCategories'])->name('categories');
-    Route::get('/coupons', [WebController::class, 'adminCoupons'])->name('coupons');
-    Route::get('/register', [WebController::class, 'adminRegister'])->name('register');
-    Route::post('/logout', function() {
-        // Clear admin token from session
-        session()->forget('admin_token');
-        Auth::logout();
-        return redirect()->route('admin.login')->with('success', 'You have been logged out.');
-    })->name('logout');
-
+    // Protected admin pages (require web session auth + admin role)
+    Route::middleware(['auth', 'admin'])->group(function () {
+        Route::get('/', [\App\Http\Controllers\WebController::class, 'adminDashboard'])->name('dashboard');
+        Route::get('/products', [\App\Http\Controllers\WebController::class, 'adminProducts'])->name('products');
+        Route::get('/orders', [\App\Http\Controllers\WebController::class, 'adminOrders'])->name('orders');
+        Route::get('/users', [\App\Http\Controllers\WebController::class, 'adminUsers'])->name('users');
+        Route::get('/reviews', [\App\Http\Controllers\WebController::class, 'adminReviews'])->name('reviews');
+        Route::get('/categories', [\App\Http\Controllers\WebController::class, 'adminCategories'])->name('categories');
+        Route::get('/coupons', [\App\Http\Controllers\WebController::class, 'adminCoupons'])->name('coupons');
+        Route::get('/register', [\App\Http\Controllers\WebController::class, 'adminRegister'])->name('register');
+        Route::post('/logout', function () {
+            session()->forget('admin_token');
+            \Illuminate\Support\Facades\Auth::logout();
+            return redirect()->route('admin.login')->with('success', 'You have been logged out.');
+        })->name('logout');
+    });
 });
