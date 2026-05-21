@@ -96,17 +96,27 @@
     window.addEventListener('cart-updated', updateCartBadge);
 
     function setupAdminLinks() {
-        const userStr = localStorage.getItem('currentUser');
-        if(userStr) {
-            try {
-                const user = JSON.parse(userStr);
-                if (user.role === 'admin' || user.role === 'super_admin') {
-                    const profileIcon = document.getElementById('profileIcon');
-                    if (profileIcon) {
-                        profileIcon.href = '/admin';
+        let isAdmin = false;
+        const role = localStorage.getItem('admin_role');
+        if (role === 'admin' || role === 'super_admin') {
+            isAdmin = true;
+        } else {
+            const userStr = localStorage.getItem('currentUser');
+            if(userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.role === 'admin' || user.role === 'super_admin') {
+                        isAdmin = true;
                     }
-                }
-            } catch(e) {}
+                } catch(e) {}
+            }
+        }
+
+        if (isAdmin) {
+            const profileIcon = document.getElementById('profileIcon');
+            if (profileIcon) {
+                profileIcon.href = '/admin/dashboard';
+            }
         }
     }
     setupAdminLinks();

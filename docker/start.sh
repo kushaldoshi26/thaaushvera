@@ -88,10 +88,12 @@ mkdir -p /var/www/html/storage/logs \
          /var/www/html/storage/framework/cache \
          /var/www/html/storage/framework/sessions \
          /var/www/html/storage/framework/views \
-         /var/www/html/bootstrap/cache
+         /var/www/html/bootstrap/cache \
+         /var/www/html/public/assets/products \
+         /var/www/html/public/assets/img
 
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/assets
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/assets 2>/dev/null || true
 
 if [ "$RESOLVED_DB_CONNECTION" = "sqlite" ]; then
     chmod -R 775 /var/www/html/database
