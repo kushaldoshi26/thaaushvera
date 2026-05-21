@@ -689,6 +689,13 @@
         const validUser = localStorage.getItem('currentUser');
         
         if (validToken && validUser) {
+            try {
+                const u = JSON.parse(validUser);
+                if (u.role === 'admin' || u.role === 'super_admin' || u.role === 'manager') {
+                    window.location.href = '/admin';
+                    return; // Stop execution
+                }
+            } catch(e) {}
             if (authText) authText.textContent = 'Logout';
         } else {
             if (authText) authText.textContent = 'Login';

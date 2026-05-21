@@ -114,12 +114,9 @@ class ProductController extends Controller
             if ($request->hasFile('image_file')) {
                 $file = $request->file('image_file');
                 $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\-.]/', '', $file->getClientOriginalName());
-                $path = public_path('assets/products');
-                if (!file_exists($path)) {
-                    mkdir($path, 0755, true);
-                }
-                $file->move($path, $filename);
-                $validated['image'] = asset('assets/products/' . $filename);
+                // Use Laravel Storage to avoid raw mkdir() permission errors on cloud hosts
+                $file->storeAs('products', $filename, 'public');
+                $validated['image'] = url('storage/products/' . $filename);
                 unset($validated['image_file']);
             }
 
@@ -169,12 +166,8 @@ class ProductController extends Controller
             if ($request->hasFile('image_file')) {
                 $file = $request->file('image_file');
                 $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\-.]/', '', $file->getClientOriginalName());
-                $path = public_path('assets/products');
-                if (!file_exists($path)) {
-                    mkdir($path, 0755, true);
-                }
-                $file->move($path, $filename);
-                $validated['image'] = asset('assets/products/' . $filename);
+                $file->storeAs('products', $filename, 'public');
+                $validated['image'] = url('storage/products/' . $filename);
                 unset($validated['image_file']);
             }
 
@@ -232,6 +225,7 @@ class ProductController extends Controller
                 'message' => 'Product not found'
             ], 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error deleting product: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting product',
