@@ -200,24 +200,44 @@
 </style>
 
 <script>
-    // Intercept global fetch to prevent sending 'Bearer session_auth'
+    // Intercept global fetch to force same-origin credentials and strip any Authorization headers, forcing Laravel to rely on the secure admin web session cookie.
     const originalFetch = window.fetch;
     window.fetch = function (input, init) {
-        if (init && init.headers) {
+        init = init || {};
+        init.credentials = 'same-origin'; // Force session cookies to be sent
+
+        // Strip any Authorization headers to avoid Sanctum conflicts with customer tokens or stale local storage tokens
+        if (init.headers) {
             if (init.headers instanceof Headers) {
-                if (init.headers.get('Authorization') === 'Bearer session_auth') {
-                    init.headers.delete('Authorization');
-                }
+                init.headers.delete('Authorization');
+                init.headers.delete('authorization');
             } else if (typeof init.headers === 'object') {
-                if (init.headers['Authorization'] === 'Bearer session_auth') {
-                    delete init.headers['Authorization'];
+                delete init.headers['Authorization'];
+                delete init.headers['authorization'];
+            }
+        }
+
+        // Auto-inject CSRF token for non-GET requests in the admin panel if missing
+        const method = (init.method || 'GET').toUpperCase();
+        if (method !== 'GET' && method !== 'HEAD') {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (csrfToken) {
+                if (!init.headers) {
+                    init.headers = {};
                 }
-                if (init.headers['authorization'] === 'Bearer session_auth') {
-                    delete init.headers['authorization'];
+                if (init.headers instanceof Headers) {
+                    if (!init.headers.has('X-CSRF-TOKEN')) {
+                        init.headers.set('X-CSRF-TOKEN', csrfToken);
+                    }
+                } else if (typeof init.headers === 'object') {
+                    if (!init.headers['X-CSRF-TOKEN'] && !init.headers['x-csrf-token']) {
+                        init.headers['X-CSRF-TOKEN'] = csrfToken;
+                    }
                 }
             }
         }
-        return originalFetch.apply(this, arguments);
+
+        return originalFetch.call(this, input, init);
     };
 
     // Inject session token into localStorage so API calls work after web login
