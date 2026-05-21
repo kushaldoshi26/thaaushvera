@@ -221,6 +221,7 @@ async function handleAuthClick(event) {
             
             localStorage.removeItem('auth_token');
             localStorage.removeItem('currentUser');
+            sessionStorage.removeItem('login_popup_shown');
             userData = {};
             isLoggedIn = false;
             updateAuthUI();
@@ -245,6 +246,9 @@ loginForm.addEventListener('submit', async (e) => {
         const response = await api.login(email, password);
         localStorage.setItem('auth_token', response.data.token);
         localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+        
+        // Clear popup flag so it won't re-show after login
+        sessionStorage.removeItem('login_popup_shown');
         
         userData = response.data.user;
         isLoggedIn = true;

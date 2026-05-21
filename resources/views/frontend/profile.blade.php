@@ -436,11 +436,14 @@
             } catch(e) {}
         } else {
             if (authText) authText.textContent = 'Login';
-            // Auto-show login modal when not logged in
-            setTimeout(() => {
-                const modal = document.getElementById('loginModal');
-                if (modal) modal.classList.add('active');
-            }, 300);
+            // Auto-show login modal ONLY ONCE per browser session
+            if (!sessionStorage.getItem('login_popup_shown')) {
+                sessionStorage.setItem('login_popup_shown', '1');
+                setTimeout(() => {
+                    const modal = document.getElementById('loginModal');
+                    if (modal) modal.classList.add('active');
+                }, 400);
+            }
         }
     })();
     
