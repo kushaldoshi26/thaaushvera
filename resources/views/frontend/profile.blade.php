@@ -812,6 +812,8 @@
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            localStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('login_popup_shown');
             alert('Logged out successfully!');
             window.location.reload();
         } else {

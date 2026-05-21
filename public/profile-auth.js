@@ -233,6 +233,9 @@ async function handleAuthClick(event) {
             
             localStorage.removeItem('auth_token');
             localStorage.removeItem('currentUser');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('isLoggedIn');
             sessionStorage.removeItem('login_popup_shown');
             userData = {};
             isLoggedIn = false;

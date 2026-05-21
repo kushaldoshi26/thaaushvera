@@ -18,6 +18,13 @@ var api = {
             const token = this.getToken();
             if (token && token !== 'session_auth') headers['Authorization'] = `Bearer ${token}`;
         }
+        
+        // Inject CSRF token for web/session requests
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (csrfToken) {
+            headers['X-CSRF-TOKEN'] = csrfToken;
+        }
+        
         return headers;
     },
 

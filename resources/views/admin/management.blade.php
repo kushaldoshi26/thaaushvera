@@ -137,6 +137,9 @@
                 <button onclick="logout()" class="w-full text-left block py-2 px-4 rounded hover:bg-red-800 text-red-400">
                     🚪 Logout
                 </button>
+                <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             </nav>
         </aside>
 
@@ -291,10 +294,13 @@
         });
 
         function logout() {
-            localStorage.removeItem('user');
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
             localStorage.removeItem('isLoggedIn');
-            window.location.href = '{{ url("/profile") }}';
+            sessionStorage.removeItem('login_popup_shown');
+            document.getElementById('adminLogoutForm').submit();
         }
 
         async function editAdmin(id) {
