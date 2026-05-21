@@ -418,7 +418,7 @@
     </aside>
     
     <!-- Main Content Preview -->
-    <main class="account-main">
+    <div class="account-main">
         <!-- Overview Tab -->
         <div id="tab-overview" class="profile-tab-content active">
             <div class="content-header">
@@ -602,7 +602,7 @@
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 </div>
 
 <!-- Login Modal -->
