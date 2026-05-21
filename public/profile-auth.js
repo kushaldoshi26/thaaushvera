@@ -227,6 +227,8 @@ async function handleAuthClick(event) {
             }
             
             localStorage.removeItem('auth_token');
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_role');
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
