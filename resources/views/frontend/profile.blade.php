@@ -72,7 +72,7 @@
         align-items: center;
         width: 100%;
         max-width: 650px;
-        margin: 50px auto;
+        margin: 120px auto 50px;
         padding: 0 1rem;
     }
     .guest-card {
