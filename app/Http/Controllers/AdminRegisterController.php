@@ -17,14 +17,31 @@ class AdminRegisterController extends Controller
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
                 'admin_role' => 'required|in:super_admin,manager,support',
+                'role' => 'sometimes|in:admin,super_admin',
             ]);
+
+            // Map admin_role to admin_level
+            $levelMap = [
+                'super_admin' => 'super',
+                'manager' => 'manager',
+                'support' => 'staff',
+            ];
+
+            $role = $validated['role'] ?? 'admin';
+            $adminLevel = $levelMap[$validated['admin_role']] ?? 'staff';
+
+            // If super_admin role, set role accordingly
+            if ($validated['admin_role'] === 'super_admin') {
+                $role = 'super_admin';
+                $adminLevel = 'super';
+            }
 
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => 'admin',
-                'admin_role' => $validated['admin_role'],
+                'role' => $role,
+                'admin_level' => $adminLevel,
                 'is_active' => true,
             ]);
 
@@ -37,7 +54,7 @@ class AdminRegisterController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'role' => $user->role,
-                        'admin_role' => $user->admin_role,
+                        'admin_level' => $user->admin_level,
                     ]
                 ]
             ], 201);
@@ -51,8 +68,7 @@ class AdminRegisterController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Registration failed',
-                'error' => $e->getMessage()
+                'message' => 'Registration failed: ' . $e->getMessage(),
             ], 500);
         }
     }

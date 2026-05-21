@@ -1,99 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Admin Account - AUSHVERA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="admin-global.css">
-    <style>
-        .submenu { display: none; padding-left: 1rem; }
-        .submenu.open { display: block; }
-        .rotate-90 { transform: rotate(90deg); }
-        
-        document.querySelectorAll('.sidebar-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const submenu = this.nextElementSibling;
-                const arrow = this.querySelector('.arrow');
-                submenu.classList.toggle('open');
-                arrow.classList.toggle('rotate-90');
-            });
-        });
-    </style>
-</head>
-<body class="bg-gray-900 flex items-center justify-center min-h-screen">
-    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <div class="text-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">AUSHVERA</h1>
-            <p class="text-gray-600 mt-2">Create Admin Account</p>
-        </div>
-        
-        <form id="adminRegisterForm" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" id="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="password" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Admin Role</label>
-                <select id="admin_role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="super_admin">Super Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="support">Support</option>
-                </select>
-            </div>
-            
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 font-medium">
-                Create Admin Account
-            </button>
-        </form>
-        
-        <p class="text-center text-sm text-gray-600 mt-4">
-            Already have an account? <a href="{{ url('/profile') }}" class="text-blue-600 hover:underline">Login</a>
-        </p>
-    </div>
+@extends('layouts.admin')
+@section('title', 'Create Admin')
 
-    <script>
-        document.getElementById('adminRegisterForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const data = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value,
-                admin_role: document.getElementById('admin_role').value,
-                role: 'admin'
-            };
-            
-            try {
-                const response = await fetch('http://localhost:8000/api/admin/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    alert('Admin account created successfully! You can now login.');
-                    window.location.href = '{{ url("/profile") }}';
-                } else {
-                    alert(result.message || 'Failed to create admin account');
-                }
-            } catch (error) {
-                alert('Error creating admin account. Please try again.');
-            }
+@push('styles')
+<style>
+.reg-wrap { padding: 24px 28px; font-family: 'Inter', sans-serif; max-width: 600px; }
+
+.reg-card {
+  background: #fff; border: 1px solid #e9ecef; border-radius: 14px; padding: 28px;
+}
+.reg-card h2 { font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 4px; }
+.reg-card .subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+
+.reg-group { margin-bottom: 18px; }
+.reg-group label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+.reg-group label span { color: #ef4444; }
+.reg-input {
+  width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px;
+  font-size: 14px; font-family: 'Inter', sans-serif; transition: border-color .2s;
+  background: #fafafa;
+}
+.reg-input:focus { outline: none; border-color: #c9a96e; box-shadow: 0 0 0 3px rgba(201,169,110,.1); background: #fff; }
+
+.reg-select {
+  width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px;
+  font-size: 14px; font-family: 'Inter', sans-serif; background: #fafafa;
+  cursor: pointer;
+}
+.reg-select:focus { outline: none; border-color: #c9a96e; }
+
+.reg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.reg-btn {
+  width: 100%; padding: 12px; border: none; border-radius: 8px;
+  background: linear-gradient(135deg, #c9a96e, #b8964c); color: #fff;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .2s;
+  font-family: 'Inter', sans-serif; margin-top: 8px;
+}
+.reg-btn:hover { opacity: .9; }
+.reg-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.reg-alert {
+  padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none;
+}
+.reg-alert.success { background: #d1fae5; color: #065f46; border: 1px solid #86efac; display: block; }
+.reg-alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; display: block; }
+</style>
+@endpush
+
+@section('content')
+<div class="reg-wrap">
+  <div class="reg-card">
+    <h2>👑 Create Admin Account</h2>
+    <p class="subtitle">Add a new admin, manager, or staff member</p>
+
+    <div id="regAlert" class="reg-alert"></div>
+
+    <form id="adminRegisterForm">
+      <div class="reg-group">
+        <label>Full Name <span>*</span></label>
+        <input type="text" id="regName" class="reg-input" required placeholder="e.g. John Doe">
+      </div>
+
+      <div class="reg-row">
+        <div class="reg-group">
+          <label>Email <span>*</span></label>
+          <input type="email" id="regEmail" class="reg-input" required placeholder="admin@example.com">
+        </div>
+        <div class="reg-group">
+          <label>Password <span>*</span></label>
+          <input type="password" id="regPassword" class="reg-input" required minlength="6" placeholder="Min 6 characters">
+        </div>
+      </div>
+
+      <div class="reg-group">
+        <label>Admin Level <span>*</span></label>
+        <select id="regLevel" class="reg-select">
+          <option value="staff">👤 Staff — View orders & products (read-only)</option>
+          <option value="manager">🏢 Manager — Full product, order & user management</option>
+          <option value="super">👑 Super Admin — Full access including admin management</option>
+        </select>
+      </div>
+
+      <button type="submit" class="reg-btn" id="regBtn">Create Admin Account</button>
+    </form>
+  </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+const token = localStorage.getItem('auth_token');
+const form = document.getElementById('adminRegisterForm');
+const alertBox = document.getElementById('regAlert');
+
+function showAlert(msg, type) {
+    alertBox.textContent = msg;
+    alertBox.className = 'reg-alert ' + type;
+    setTimeout(() => { if (type === 'success') alertBox.style.display = 'none'; }, 5000);
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('regBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+    alertBox.style.display = 'none';
+
+    const levelMap = { staff: 'admin', manager: 'admin', super: 'super_admin' };
+    const level = document.getElementById('regLevel').value;
+
+    const data = {
+        name: document.getElementById('regName').value.trim(),
+        email: document.getElementById('regEmail').value.trim(),
+        password: document.getElementById('regPassword').value,
+        admin_role: level === 'super' ? 'super_admin' : 'manager',
+        role: levelMap[level] || 'admin'
+    };
+
+    try {
+        const res = await fetch('{{ url("/api/admin/register") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+            },
+            body: JSON.stringify(data)
         });
-    </script>
-</body>
-</html>
+
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+            showAlert('✅ Admin account created successfully! (' + data.email + ')', 'success');
+            form.reset();
+        } else {
+            const errMsg = result.errors
+                ? Object.values(result.errors).flat().join(', ')
+                : (result.message || 'Failed to create admin');
+            showAlert('❌ ' + errMsg, 'error');
+        }
+    } catch (error) {
+        showAlert('❌ Network error. Please try again.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Admin Account';
+    }
+});
+</script>
+@endpush
