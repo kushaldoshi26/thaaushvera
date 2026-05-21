@@ -351,7 +351,7 @@
             <span class="account-label">ACCOUNT</span>
         </div>
         
-        <nav class="sidebar-nav">
+        <div class="sidebar-nav">
             <a href="javascript:void(0)" class="nav-item active" data-tab="overview">
                 <span class="nav-indicator"></span>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -402,7 +402,7 @@
                 </svg>
                 <span class="nav-text">Security</span>
             </a>
-        </nav>
+        </div>
         
         <div class="sidebar-footer">
             <div class="footer-divider"></div>

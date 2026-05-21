@@ -97,7 +97,7 @@ function updateAuthUI() {
         }
     } else {
         if (authText) authText.textContent = 'Login';
-        if (guestContainer) guestContainer.style.display = 'flex';
+        if (guestContainer) guestContainer.style.display = 'none';
         if (accountContainer) accountContainer.style.display = 'none';
     }
     updateProfileDisplay();
