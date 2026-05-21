@@ -56,7 +56,7 @@
             
             <div class="form-group">
                 <label>Upload Image</label>
-                <input type="file" id="bannerImageFile" accept="image/*" onchange="previewImage(this)" required>
+                <input type="file" id="bannerImageFile" accept="image/*" onchange="previewImage(this)">
                 <input type="hidden" id="bannerImage">
                 <div id="imagePreview" class="mt-2" style="display:none;">
                     <img id="previewImg" style="max-width:100%;height:200px;object-fit:contain;border:2px solid #e5e7eb;border-radius:8px;padding:8px;">
@@ -173,9 +173,37 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const bannerId = document.getElementById('bannerId').value;
+    let finalImageUrl = document.getElementById('bannerImage').value;
+    const fileInput = document.getElementById('bannerImageFile');
+    const token = api.getToken();
+    
+    // If a new file is selected, upload it first
+    if (fileInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        try {
+            const uploadRes = await fetch('{{ url("/api/admin/banners/upload") }}', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            const uploadData = await uploadRes.json();
+            if (uploadData.success) {
+                // Prepend slash to make it an absolute path
+                finalImageUrl = '/' + uploadData.path; 
+            } else {
+                alert('Failed to upload image file');
+                return;
+            }
+        } catch (error) {
+            alert('Error uploading image');
+            return;
+        }
+    }
+    
     const data = {
         title: document.getElementById('bannerTitle').value,
-        image_url: document.getElementById('bannerImage').value,
+        image_url: finalImageUrl,
         link_url: document.getElementById('bannerLink').value || null,
         display_order: parseInt(document.getElementById('bannerOrder').value),
         rotation_time: parseInt(document.getElementById('rotationTime').value),
@@ -183,7 +211,6 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     };
     
     try {
-        const token = api.getToken();
         const url = bannerId ? `{{ url("/api/admin/banners") }}/${bannerId}` : '{{ url("/api/admin/banners") }}';
         const response = await fetch(url, {
             method: bannerId ? 'PUT' : 'POST',
@@ -210,7 +237,7 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
 async function toggleBanner(id, currentStatus) {
     try {
         const token = api.getToken();
-        await fetch(`{{ url("/api/admin/banners") }}/${id}`, {
+        await fetch(`{{ url("/api/admin/banners") }}/${id}/toggle`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

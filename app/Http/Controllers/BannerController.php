@@ -91,7 +91,7 @@ class BannerController extends Controller
         $file = $request->file('image');
         $filename = 'banner_' . time() . '.' . $file->getClientOriginalExtension();
         
-        $destinationPath = base_path('../assets/img');
+        $destinationPath = public_path('assets/img');
         $file->move($destinationPath, $filename);
 
         return response()->json([
@@ -104,7 +104,7 @@ class BannerController extends Controller
     public function delete(Request $request)
     {
         $filename = $request->input('filename');
-        $path = base_path('../assets/img/' . $filename);
+        $path = public_path('assets/img/' . $filename);
         
         if (file_exists($path)) {
             unlink($path);
