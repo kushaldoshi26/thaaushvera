@@ -37,11 +37,11 @@ class ThankYouMail extends Mailable
         $name = htmlspecialchars($this->user->name);
         if ($this->type === 'registration') {
             $title = "Welcome to Aushvera";
-            $message = "We are absolutely thrilled to welcome you to the Aushvera family! Thank you so much for registering an account with us. We are dedicated to providing the most refined, pure, and natural Ayurvedic wellness experiences crafted specifically for your holistic lifestyle. Enjoy exploring our signature collection!";
+            $message = "We are absolutely thrilled to welcome you to the Aushvera family! Thank you for visiting our website, we hope you'll love our products. As a special gift, please enjoy this discount coupon: <strong style=\"color:#B8964C;\">WELCOME10</strong> for 10% off your first purchase!";
             $cta = '<a href="' . url('/profile') . '" style="display:inline-block;background:linear-gradient(135deg,#B8964C,#9B7B36);color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;border-radius:30px;letter-spacing:1px;text-transform:uppercase;">Explore Your Profile</a>';
         } else {
             $title = "Successful Login Alert";
-            $message = "This is a quick confirmation to let you know that you have successfully logged into your Aushvera account recently. If this was you, no action is required—your session is perfectly secure. Thank you for your continued trust in Aushvera!";
+            $message = "Thank you for visiting our website and logging back into your Aushvera account! We hope you'll love our products. As a token of our appreciation, here is a discount coupon for your next order: <strong style=\"color:#B8964C;\">WELCOME10</strong> for 10% off!";
             $cta = '<a href="' . url('/profile') . '" style="display:inline-block;background:linear-gradient(135deg,#1a2f45,#0d1f35);color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;border-radius:30px;letter-spacing:1px;text-transform:uppercase;">View Account Activity</a>';
         }
 
