@@ -258,12 +258,6 @@ loginForm.addEventListener('submit', async (e) => {
         loginModal.classList.remove('active');
         loginForm.reset();
         
-        if (userData.role === 'admin' || userData.role === 'super_admin') {
-            // Show admin link in sidebar
-            const adminLink = document.getElementById('adminPanelLink');
-            if (adminLink) adminLink.style.display = '';
-        }
-        
         alert('Login successful!');
         window.location.reload();
     } catch (error) {

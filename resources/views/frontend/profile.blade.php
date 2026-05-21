@@ -137,14 +137,6 @@
                 <span class="nav-text">Security</span>
             </a>
 
-            <a href="/admin" class="nav-item" id="adminPanelLink" style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 15px; padding-top: 15px;">
-                <span class="nav-indicator"></span>
-                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="gold" stroke-width="1.5">
-                    <path d="M12 2l-10 4v6c0 5 4 10 10 12 6-2 10-7 10-12v-6l-10-4z"/>
-                    <path d="M12 6v14"/>
-                </svg>
-                <span class="nav-text" style="color: gold;">Admin Panel</span>
-            </a>
         </nav>
         
         <div class="sidebar-footer">
@@ -426,14 +418,6 @@
         
         if (validToken && validUser) {
             if (authText) authText.textContent = 'Logout';
-            // Show admin panel link if admin
-            try {
-                const u = JSON.parse(validUser);
-                if (u.role === 'admin' || u.role === 'super_admin') {
-                    const adminLink = document.getElementById('adminPanelLink');
-                    if (adminLink) adminLink.style.display = '';
-                }
-            } catch(e) {}
         } else {
             if (authText) authText.textContent = 'Login';
             // Auto-show login modal ONLY ONCE per browser session
