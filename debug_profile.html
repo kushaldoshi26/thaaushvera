@@ -1,9 +1,44 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="F1EdXjtFBTECZRN5tYurEPiE4M41TYxo0wwGTCfR">
 
-@section('title', 'My Profile — AUSHVERA')
+<!-- Primary Meta Tags -->
+<title>My Profile — AUSHVERA</title>
+<meta name="title" content="My Profile — AUSHVERA">
+<meta name="description" content="Premium Ayurvedic wellness products rooted in ancient botanical wisdom.">
+<meta name="keywords" content="ayurveda, wellness, ayurvedic products, herbal medicine, holistic health, botanicals">
+<meta name="author" content="Aushvera">
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('profile-styles.css') }}?v={{ time() }}">
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="http://127.0.0.1:8000/profile">
+<meta property="og:title" content="My Profile — AUSHVERA">
+<meta property="og:description" content="Premium Ayurvedic wellness products rooted in ancient botanical wisdom.">
+<meta property="og:image" content="http://127.0.0.1:8000/assets/img/og-banner.jpg">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="http://127.0.0.1:8000/profile">
+<meta property="twitter:title" content="My Profile — AUSHVERA">
+<meta property="twitter:description" content="Premium Ayurvedic wellness products rooted in ancient botanical wisdom.">
+<meta property="twitter:image" content="http://127.0.0.1:8000/assets/img/og-banner.jpg">
+
+<!-- Canonical -->
+<link rel="canonical" href="http://127.0.0.1:8000/profile">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="http://127.0.0.1:8000/favicon.svg">
+
+<!-- Structured Data -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="http://127.0.0.1:8000/styles.css">
+    <link rel="stylesheet" href="http://127.0.0.1:8000/assets/css/responsive.css">
+    <link rel="stylesheet" href="http://127.0.0.1:8000/profile-styles.css?v=1779384339">
 <style>
     .social-login-separator {
         display: flex;
@@ -234,24 +269,128 @@
         box-shadow: 0 6px 20px rgba(184, 150, 76, 0.3);
     }
 </style>
-@endpush
+</head>
+<body>
+    <nav class="nav-home" id="siteNav">
+    <div class="nav-container">
+        <!-- Left Links (desktop only) -->
+        <div class="nav-left">
+            <ul class="nav-links">
+                <li><a href="http://127.0.0.1:8000" class="">HOME</a></li>
+                <li><a href="http://127.0.0.1:8000/about" class="">ABOUT</a></li>
+                <li><a href="http://127.0.0.1:8000/philosophy" class="">PHILOSOPHY</a></li>
+            </ul>
+        </div>
 
-@section('content')
-@if(session('error'))
-<div style="max-width: 800px; margin: 100px auto 0; padding: 15px 20px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; color: #b91c1c; font-size: 14px; text-align: center;">
-    ⚠️ {{ session('error') }}
-</div>
-@endif
-@if(session('success'))
-<div style="max-width: 800px; margin: 100px auto 0; padding: 15px 20px; background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; color: #166534; font-size: 14px; text-align: center;">
-    ✅ {{ session('success') }}
-</div>
-@endif
-<div id="guestContainer" class="guest-landing-container" style="display: none;">
+        <!-- Logo Center -->
+        <a class="nav-center" href="http://127.0.0.1:8000">
+            <img src="http://127.0.0.1:8000/assets/img/logo.png" alt="AUSHVERA Logo" class="nav-logo" onerror="this.style.display='none'">
+            <span>AUSHVERA</span>
+        </a>
+
+        <!-- Right Links + Icons -->
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="http://127.0.0.1:8000/products" class="">PRODUCT</a></li>
+                <li><a href="http://127.0.0.1:8000/ritual" class="">RITUAL</a></li>
+                <li><a href="http://127.0.0.1:8000/contact" class="">CONTACT</a></li>
+            </ul>
+            <!-- Cart Icon -->
+            <a href="http://127.0.0.1:8000/cart" class="cart-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                <span class="cart-count" id="cartBadge" style="display:none;">0</span>
+            </a>
+            <!-- Profile Icon -->
+            <a href="http://127.0.0.1:8000/profile" class="nav-icon" id="profileIcon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+                </svg>
+            </a>
+            <!-- Mobile burger (inside nav-right so it stays on the right) -->
+            <button class="nav-burger" id="navBurger" aria-label="Open Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="nav-drawer" id="navDrawer">
+        <div class="nav-drawer-header">
+            <span>AUSHVERA</span>
+            <button class="nav-drawer-close" id="navClose" aria-label="Close Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <ul class="nav-drawer-links">
+            <li><a href="http://127.0.0.1:8000" class="">Home</a></li>
+            <li><a href="http://127.0.0.1:8000/about" class="">About</a></li>
+            <li><a href="http://127.0.0.1:8000/philosophy" class="">Philosophy</a></li>
+            <li><a href="http://127.0.0.1:8000/products" class="">Product</a></li>
+            <li><a href="http://127.0.0.1:8000/ritual" class="">Ritual</a></li>
+            <li><a href="http://127.0.0.1:8000/contact" class="">Contact</a></li>
+            <li><a href="http://127.0.0.1:8000/cart" class="">Cart</a></li>
+        </ul>
+    </div>
+    <div class="nav-overlay" id="navOverlay"></div>
+</nav>
+
+<script>
+(function() {
+    const burger = document.getElementById('navBurger');
+    const close = document.getElementById('navClose');
+    const drawer = document.getElementById('navDrawer');
+    const overlay = document.getElementById('navOverlay');
+    const nav = document.getElementById('siteNav');
+
+    function openDrawer() { drawer.classList.add('open'); overlay.classList.add('show'); document.body.style.overflow='hidden'; }
+    function closeDrawer() { drawer.classList.remove('open'); overlay.classList.remove('show'); document.body.style.overflow=''; }
+
+    if (burger) burger.addEventListener('click', openDrawer);
+    if (close) close.addEventListener('click', closeDrawer);
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    // Scroll effect
+    window.addEventListener('scroll', function() {
+        nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const count = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+        const el = document.getElementById('cartBadge');
+        if (el) { el.textContent = count; el.style.display = count > 0 ? 'inline-flex' : 'none'; }
+    }
+    updateCartBadge();
+    window.addEventListener('cart-updated', updateCartBadge);
+
+    function setupAdminLinks() {
+        const userStr = localStorage.getItem('currentUser');
+        if(userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user.role === 'admin' || user.role === 'super_admin') {
+                    const profileIcon = document.getElementById('profileIcon');
+                    if (profileIcon) {
+                        profileIcon.href = '/admin';
+                    }
+                }
+            } catch(e) {}
+        }
+    }
+    setupAdminLinks();
+})();
+</script>
+    <main id="main-content">
+        <div id="guestContainer" class="guest-landing-container" style="display: none;">
     <div class="guest-card">
         <div class="guest-header">
             <div class="guest-logo">
-                <img src="{{ asset('assets/img/logo.png') }}" alt="AUSHVERA" onerror="this.style.display='none'">
+                <img src="http://127.0.0.1:8000/assets/img/logo.png" alt="AUSHVERA" onerror="this.style.display='none'">
                 <h2>AUSHVERA</h2>
             </div>
             <p class="guest-tagline">Ayurvedic Wellness & Self-Care Portal</p>
@@ -284,11 +423,11 @@
                 <span>Or continue with</span>
             </div>
             <div class="social-login-options">
-                <a href="{{ route('auth.google') }}" class="social-btn google-btn" style="text-decoration: none;">
+                <a href="http://127.0.0.1:8000/auth/google" class="social-btn google-btn" style="text-decoration: none;">
                     <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                     Google
                 </a>
-                <a href="{{ route('auth.facebook') }}" class="social-btn facebook-btn" style="text-decoration: none;">
+                <a href="http://127.0.0.1:8000/auth/facebook" class="social-btn facebook-btn" style="text-decoration: none;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                     Facebook
                 </a>
@@ -495,7 +634,7 @@
                     </form>
                 </div>
                 
-                {{-- ─── Membership / Subscription Card ─── --}}
+                
                 <div class="info-card" id="subscriptionCard">
                     <div class="card-header">
                         <h3>Membership & Subscription</h3>
@@ -606,11 +745,11 @@
 </div>
 
 <!-- Login Modal -->
-<div id="loginModal" class="auth-modal">
+<div id="loginModal" class="auth-modal  active ">
     <div class="modal-content">
         <span class="close-modal" id="closeLogin">&times;</span>
         <div class="modal-logo" style="text-align:center;margin-bottom:8px;">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="AUSHVERA" style="width:50px;height:50px;margin:0 auto;display:block;" onerror="this.style.display='none'">
+            <img src="http://127.0.0.1:8000/assets/img/logo.png" alt="AUSHVERA" style="width:50px;height:50px;margin:0 auto;display:block;" onerror="this.style.display='none'">
         </div>
         <h2>Welcome Back</h2>
         <p class="modal-subtitle">Sign in to your Aushvera account<br><small style="color:#B8964C;font-size:11px;">Works for both Admin & User accounts</small></p>
@@ -627,11 +766,11 @@
             <span>Or continue with</span>
         </div>
         <div class="social-login-options">
-            <a href="{{ route('auth.google') }}" class="social-btn google-btn" style="text-decoration: none;">
+            <a href="http://127.0.0.1:8000/auth/google" class="social-btn google-btn" style="text-decoration: none;">
                 <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                 Google
             </a>
-            <a href="{{ route('auth.facebook') }}" class="social-btn facebook-btn" style="text-decoration: none;">
+            <a href="http://127.0.0.1:8000/auth/facebook" class="social-btn facebook-btn" style="text-decoration: none;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 Facebook
             </a>
@@ -641,14 +780,14 @@
     </div>
 </div>
 
-{{-- ── Forgot Password Modal ─────────────────────────────── --}}
+
 <div id="forgotModal" class="auth-modal">
     <div class="modal-content">
         <span class="close-modal" id="closeForgot">&times;</span>
         <h2>Reset Password</h2>
         <p class="modal-subtitle">We'll send an OTP to your email</p>
 
-        {{-- Step 1: Enter email --}}
+        
         <div id="forgotStep1">
             <form class="auth-form" id="forgotEmailForm">
                 <input type="email" id="forgotEmail" placeholder="Enter your email address" required>
@@ -656,7 +795,7 @@
             </form>
         </div>
 
-        {{-- Step 2: Verify OTP --}}
+        
         <div id="forgotStep2" style="display:none;">
             <p style="color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:12px;text-align:center;">OTP sent to <strong id="forgotEmailDisplay" style="color:#B8964C;"></strong></p>
             <form class="auth-form" id="verifyOtpForm">
@@ -668,7 +807,7 @@
             </div>
         </div>
 
-        {{-- Step 3: New password --}}
+        
         <div id="forgotStep3" style="display:none;">
             <form class="auth-form" id="newPasswordForm">
                 <input type="password" id="newPassword" placeholder="New Password (min 8 characters)" minlength="8" required>
@@ -686,7 +825,7 @@
     <div class="modal-content">
         <span class="close-modal" id="closeSignup">&times;</span>
         <div class="modal-logo">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="AUSHVERA Logo" style="width: 60px; height: 60px;">
+            <img src="http://127.0.0.1:8000/assets/img/logo.png" alt="AUSHVERA Logo" style="width: 60px; height: 60px;">
             <h2 style="margin-top: 1rem;">AUSHVERA</h2>
         </div>
         <p class="modal-subtitle">Create your wellness account</p>
@@ -714,11 +853,11 @@
             <span>Or register with</span>
         </div>
         <div class="social-login-options">
-            <a href="{{ route('auth.google') }}" class="social-btn google-btn" style="text-decoration: none;">
+            <a href="http://127.0.0.1:8000/auth/google" class="social-btn google-btn" style="text-decoration: none;">
                 <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                 Google
             </a>
-            <a href="{{ route('auth.facebook') }}" class="social-btn facebook-btn" style="text-decoration: none;">
+            <a href="http://127.0.0.1:8000/auth/facebook" class="social-btn facebook-btn" style="text-decoration: none;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 Facebook
             </a>
@@ -727,39 +866,83 @@
         <p class="switch-auth" style="margin-top: 0;">Already have an account? <a href="#" id="showLogin">Sign In</a></p>
     </div>
 </div>
-@endsection
+    </main>
+    <footer>
+    <div class="footer-top">
+        <div class="footer-logo">
+            <img src="http://127.0.0.1:8000/assets/img/logo.png" alt="AUSHVERA" onerror="this.style.display='none'">
+        </div>
+        <p class="footer-tagline">Rooted in heritage. Refined for modern ritual.</p>
+        <div class="footer-divider"></div>
+    </div>
 
-@push('scripts')
-<script src="{{ asset('api-config.js') }}"></script>
+    <div class="footer-columns">
+        <div class="footer-column">
+            <h3>About Aushvera</h3>
+            <p>A premium Ayurvedic wellness brand honoring ancient botanical wisdom through refined, modern formulations. Each product embodies our commitment to purity, transparency, and timeless elegance.</p>
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <ul class="footer-links">
+                <li><a href="http://127.0.0.1:8000">Home</a></li>
+                <li><a href="http://127.0.0.1:8000/philosophy">Philosophy</a></li>
+                <li><a href="http://127.0.0.1:8000/products">Product</a></li>
+                <li><a href="http://127.0.0.1:8000/ritual">Ritual</a></li>
+                <li><a href="http://127.0.0.1:8000/contact">Contact</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>Connect</h3>
+            <ul class="footer-contact">
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <span>Gurukul Rd, Gandhidham, India, 370201</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    <span>aushveraglobalbiz1718@gmail.com</span>
+                </li>
+            </ul>
+            <div class="footer-social">
+                <a href="https://www.instagram.com/theaushvera?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                </a>
+                <a href="" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/in/aushvera-globalbiz-llp-322470380" aria-label="LinkedIn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                        <rect x="2" y="9" width="4" height="12"/>
+                        <circle cx="4" cy="4" r="2"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 AUSHVERA. All rights reserved. | <a href="http://127.0.0.1:8000/terms" style="color: #C6A75E; text-decoration: none;">Terms &amp; Conditions</a></p>
+    </div>
+</footer>
+    <script src="http://127.0.0.1:8000/api-config.js"></script>
 <script>
     // Handle server-side authenticated user (from OAuth flow)
-    @if($user ?? null)
-        (function() {
-            const serverUser = @json($user ?? []);
-            if (serverUser && serverUser.id) {
-                localStorage.setItem('auth_token', 'session_auth');
-                localStorage.setItem('currentUser', JSON.stringify(serverUser));
-                
-                // Update display immediately
-                const displayName = document.getElementById('displayName');
-                const displayEmail = document.getElementById('displayEmail');
-                const displayPhone = document.getElementById('displayPhone');
-                const displayDob = document.getElementById('displayDob');
-                const displayGender = document.getElementById('displayGender');
-                const displayAddress = document.getElementById('displayAddress');
-                const authText = document.getElementById('authText');
-                
-                if (displayName) displayName.textContent = serverUser.name || 'User';
-                if (displayEmail) displayEmail.textContent = serverUser.email || '';
-                if (displayPhone) displayPhone.textContent = serverUser.phone || 'Not provided';
-                if (displayDob) displayDob.textContent = serverUser.dob || 'Not provided';
-                if (displayGender) displayGender.textContent = serverUser.gender || 'Not provided';
-                if (displayAddress) displayAddress.textContent = serverUser.address || 'Not provided';
-                if (authText) authText.textContent = 'Logout';
-            }
-        })();
-    @endif
-    
+        
     // FORCE CLEAR OLD TOKENS ON PAGE LOAD
     (function() {
         // Clear any old/invalid tokens
@@ -767,7 +950,7 @@
         const user = localStorage.getItem('currentUser');
         
         // Clear session_auth if the server session is guest (logged out)
-        if (token === 'session_auth' && @json(!Auth::check())) {
+        if (token === 'session_auth' && true) {
             localStorage.removeItem('auth_token');
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
@@ -814,7 +997,7 @@
         }
     }
 </script>
-<script src="{{ asset('profile-auth.js') }}?v={{ time() }}"></script>
+<script src="http://127.0.0.1:8000/profile-auth.js?v=1779384339"></script>
 <script>
 // ── Subscription System ──────────────────────────────────────────────────────
 const SUB_CONTENT = document.getElementById('subscriptionContent');
@@ -1015,4 +1198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(loadSubscriptionData, 300); // slight delay so auth token is set
 });
 </script>
-@endpush
+    
+    <script src="http://127.0.0.1:8000/assets/js/chatbot.js" defer></script>
+</body>
+</html>
