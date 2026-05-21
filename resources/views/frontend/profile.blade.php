@@ -3,7 +3,7 @@
 @section('title', 'My Profile — AUSHVERA')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('profile-styles.css') }}">
+<link rel="stylesheet" href="{{ asset('profile-styles.css') }}?v={{ time() }}">
 <style>
     .social-login-separator {
         display: flex;
@@ -814,7 +814,7 @@
         }
     }
 </script>
-<script src="{{ asset('profile-auth.js') }}"></script>
+<script src="{{ asset('profile-auth.js') }}?v={{ time() }}"></script>
 <script>
 // ── Subscription System ──────────────────────────────────────────────────────
 const SUB_CONTENT = document.getElementById('subscriptionContent');
