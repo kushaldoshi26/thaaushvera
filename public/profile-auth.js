@@ -97,12 +97,8 @@ function updateAuthUI() {
         }
     } else {
         if (authText) authText.textContent = 'Login';
-        if (guestContainer) guestContainer.style.display = 'none';
+        if (guestContainer) guestContainer.style.display = 'flex';
         if (accountContainer) accountContainer.style.display = 'none';
-        // Show login popup instead of inline guest form
-        if (loginModal && !loginModal.classList.contains('active')) {
-            loginModal.classList.add('active');
-        }
     }
     updateProfileDisplay();
 }

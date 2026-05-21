@@ -606,7 +606,7 @@
 </div>
 
 <!-- Login Modal -->
-<div id="loginModal" class="auth-modal">
+<div id="loginModal" class="auth-modal @guest active @endguest">
     <div class="modal-content">
         <span class="close-modal" id="closeLogin">&times;</span>
         <div class="modal-logo" style="text-align:center;margin-bottom:8px;">
