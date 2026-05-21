@@ -112,7 +112,7 @@ function filterByStatus(status) {
 
 async function updateOrderStatus(id, status) {
     try {
-        const token = localStorage.getItem('auth_token');
+        const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
         const res = await fetch(`/api/admin/orders/${id}/status`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) },

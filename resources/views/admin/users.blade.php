@@ -90,7 +90,7 @@ function filterUsers(q) {
 
 function deleteUser(id, name) {
     if (!confirm(`Remove user "${name}"? This cannot be undone.`)) return;
-    const token = localStorage.getItem('auth_token');
+    const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
     fetch(`/api/admin/users/${id}`, {
         method: 'DELETE',
         headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) }

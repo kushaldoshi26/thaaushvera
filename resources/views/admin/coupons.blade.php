@@ -90,7 +90,7 @@
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
 function getAdminToken() {
-    return localStorage.getItem('auth_token') || '';
+    return (localStorage.getItem('admin_token') || localStorage.getItem('auth_token')) || '';
 }
 
 function adminHeaders(contentType = false) {

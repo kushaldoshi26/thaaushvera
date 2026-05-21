@@ -5,7 +5,7 @@ if (typeof API_BASE_URL === 'undefined') {
 
 var api = {
     getToken() {
-        return localStorage.getItem('auth_token');
+        return localStorage.getItem('admin_token') || localStorage.getItem('auth_token');
     },
 
     getHeaders(includeAuth = false) {

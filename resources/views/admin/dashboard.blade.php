@@ -161,7 +161,7 @@ table.mini tr:last-child td { border-bottom:none; }
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-const token = localStorage.getItem('auth_token');
+const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
 const authHeaders = token ? { 'Authorization': 'Bearer ' + token } : {};
 const fmt = n => '₹' + parseFloat(n||0).toLocaleString('en-IN', {maximumFractionDigits:0});
 

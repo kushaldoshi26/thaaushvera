@@ -89,7 +89,7 @@
 
 @push('scripts')
 <script>
-const token = localStorage.getItem('auth_token');
+const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
 const form = document.getElementById('adminRegisterForm');
 const alertBox = document.getElementById('regAlert');
 

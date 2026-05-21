@@ -101,7 +101,7 @@ function filterByApproval(v) {
 }
 
 async function updateReview(id, status) {
-    const token = localStorage.getItem('auth_token');
+    const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
     try {
         const res = await fetch(`/api/admin/reviews/${id}/status`, {
             method: 'PUT',
@@ -115,7 +115,7 @@ async function updateReview(id, status) {
 
 async function deleteReview(id) {
     if (!confirm('Delete this review?')) return;
-    const token = localStorage.getItem('auth_token');
+    const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
     try {
         const res = await fetch(`/api/admin/reviews/${id}`, {
             method: 'DELETE',

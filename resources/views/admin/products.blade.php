@@ -233,7 +233,7 @@ async function saveProduct(e) {
     try {
         const url = id ? `/api/admin/products/${id}` : '/api/admin/products';
         const method = 'POST'; // using POST due to _method spoofing for FormData
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('admin_token') || (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
         const res = await fetch(url, {
             method,
             headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) },
@@ -263,7 +263,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async () =
     const btn = document.getElementById('confirmDeleteBtn');
     btn.disabled = true; btn.textContent = 'Deleting...';
     try {
-        const token = localStorage.getItem('auth_token');
+        const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
         const res = await fetch(`/api/admin/products/${deleteTarget}`, {
             method: 'DELETE',
             headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) }

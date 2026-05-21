@@ -210,7 +210,7 @@ table.lh-table tbody tr:hover { background: #fafbfc; }
 
 @push('scripts')
 <script>
-const token = localStorage.getItem('auth_token');
+const token = (localStorage.getItem('admin_token') || localStorage.getItem('auth_token'));
 const authHeaders = token ? { 'Authorization': 'Bearer ' + token } : {};
 
 let allLogs = [];

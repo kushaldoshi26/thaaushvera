@@ -161,7 +161,7 @@
 <script>
 const CSRF_T = document.querySelector('meta[name="csrf-token"]').content;
 
-function getToken() { return localStorage.getItem('auth_token') || ''; }
+function getToken() { return (localStorage.getItem('admin_token') || localStorage.getItem('auth_token')) || ''; }
 function hdr(json = false) {
     const h = { 'Accept': 'application/json', 'Authorization': 'Bearer ' + getToken(), 'X-CSRF-TOKEN': CSRF_T };
     if (json) h['Content-Type'] = 'application/json';
