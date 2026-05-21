@@ -183,6 +183,11 @@ class WebController extends Controller
         return view('admin.register');
     }
 
+    public function adminLoginHistory()
+    {
+        return view('admin.login-history');
+    }
+
     public function adminLogout()
     {
         session()->forget('admin_token');

@@ -8,9 +8,12 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Http\Traits\RecordsLoginHistory;
 
 class SocialAuthController extends Controller
 {
+    use RecordsLoginHistory;
+
     public function redirectToGoogle()
     {
         $clientId = config('services.google.client_id');
@@ -66,6 +69,7 @@ class SocialAuthController extends Controller
             }
 
             Auth::login($user);
+            $this->recordLoginHistory($user->id, 'google');
             
             // Redirect admins to admin panel, users to profile
             if (in_array($user->role, ['admin', 'super_admin'])) {
@@ -159,6 +163,7 @@ class SocialAuthController extends Controller
             }
 
             Auth::login($user);
+            $this->recordLoginHistory($user->id, 'facebook');
             return redirect('/profile'); // Changed to dashboard if needed
 
         } catch (\Exception $e) {

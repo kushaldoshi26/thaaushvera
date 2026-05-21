@@ -8,9 +8,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Http\Traits\RecordsLoginHistory;
 
 class OAuthController extends Controller
 {
+    use RecordsLoginHistory;
+
     /**
      * Handle Google OAuth callback from frontend (token-based)
      */
@@ -145,6 +148,9 @@ class OAuthController extends Controller
                     Log::error('Cart creation failed for OAuth user ' . $user->id . ': ' . $e->getMessage());
                 }
             }
+
+            // Record login history
+            $this->recordLoginHistory($user->id, $provider);
 
             $token = $user->createToken('oauth_token')->plainTextToken;
 

@@ -118,6 +118,14 @@
             </a>
             @endif
 
+            {{-- Login History — Manager & Super only --}}
+            @if($isManager)
+            <a href="{{ route('admin.login-history') }}" class="sidebar-link {{ request()->routeIs('admin.login-history') ? 'active' : '' }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Login History
+            </a>
+            @endif
+
             <div class="sidebar-divider"></div>
 
             {{-- AI Agent — All levels --}}

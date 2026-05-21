@@ -6,9 +6,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Http\Traits\RecordsLoginHistory;
 
 class AuthController extends Controller
 {
+    use RecordsLoginHistory;
+
     /**
      * Register a new user
      */
@@ -128,6 +131,7 @@ class AuthController extends Controller
 
             // Update last login
             $user->update(['last_login_at' => now()]);
+            $this->recordLoginHistory($user->id, 'api');
 
             // Create token
             $token = $user->createToken('auth_token')->plainTextToken;

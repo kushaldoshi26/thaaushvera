@@ -8,9 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Traits\RecordsLoginHistory;
 
 class AdminController extends Controller
 {
+    use RecordsLoginHistory;
+
     /**
      * Show the admin login page
      */
@@ -48,6 +51,7 @@ class AdminController extends Controller
 
         Auth::login($user);
         $user->update(['last_login_at' => now()]);
+        $this->recordLoginHistory($user->id, 'email');
 
         // Also store a Sanctum token in session for JS API calls
         $token = $user->createToken('admin_session')->plainTextToken;
@@ -267,8 +271,17 @@ class AdminController extends Controller
     {
         $history = DB::table('login_history')
             ->join('users', 'login_history.user_id', '=', 'users.id')
-            ->select('users.name', 'users.email', 'users.role', 'login_history.login_time', 'login_history.ip_address')
+            ->select(
+                'users.name',
+                'users.email',
+                'users.role',
+                'login_history.login_time',
+                'login_history.ip_address',
+                'login_history.login_method',
+                'login_history.user_agent'
+            )
             ->orderBy('login_history.login_time', 'desc')
+            ->limit(500)
             ->get();
         return response()->json($history);
     }

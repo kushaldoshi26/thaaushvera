@@ -58,6 +58,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/subscriptions', [\App\Http\Controllers\WebController::class, 'adminSubscriptions'])->name('subscriptions');
         Route::get('/emails', [\App\Http\Controllers\WebController::class, 'adminEmails'])->name('emails');
         Route::get('/register', [\App\Http\Controllers\WebController::class, 'adminRegister'])->name('register');
+        Route::get('/login-history', [\App\Http\Controllers\WebController::class, 'adminLoginHistory'])->name('login-history');
         Route::post('/logout', [\App\Http\Controllers\WebController::class, 'adminLogout'])->name('logout');
     });
 });
