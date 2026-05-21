@@ -18,34 +18,31 @@ APP_URL=${APP_URL:-https://thaaaaaaushvera.onrender.com}
 LOG_CHANNEL=stderr
 LOG_LEVEL=error
 
-DB_CONNECTION=${DB_CONNECTION:-sqlite}
-DB_DATABASE=${DB_DATABASE:-/var/data/database.sqlite}
+DB_CONNECTION=${DB_CONNECTION:-pgsql}
+DATABASE_URL=${DATABASE_URL:-}
 
-SESSION_DRIVER=${SESSION_DRIVER:-file}
+SESSION_DRIVER=database
 SESSION_LIFETIME=120
 SESSION_SECURE_COOKIE=true
 SESSION_SAME_SITE=lax
-CACHE_DRIVER=${CACHE_DRIVER:-file}
+CACHE_DRIVER=database
 QUEUE_CONNECTION=sync
-
-# AI Support
-OPENAI_API_KEY=${OPENAI_API_KEY:-}
-GEMINI_API_KEY=${GEMINI_API_KEY:-}
-STABILITY_API_KEY=${STABILITY_API_KEY:-}
-AI_SERVER_URL=${AI_SERVER_URL:-http://127.0.0.1:9000}
 
 # Social Login Support
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
-GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-}
+GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-https://thaaaaaaushvera.onrender.com/auth/google/callback}
 FACEBOOK_CLIENT_ID=${FACEBOOK_CLIENT_ID:-}
 FACEBOOK_CLIENT_SECRET=${FACEBOOK_CLIENT_SECRET:-}
-FACEBOOK_REDIRECT_URI=${FACEBOOK_REDIRECT_URI:-}
+FACEBOOK_REDIRECT_URI=${FACEBOOK_REDIRECT_URI:-https://thaaaaaaushvera.onrender.com/auth/facebook/callback}
 
 # Payment Support
 RAZORPAY_KEY=${RAZORPAY_KEY:-}
 RAZORPAY_SECRET=${RAZORPAY_SECRET:-}
 RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET:-}
+
+# Chatbot / AI
+GEMINI_API_KEY=${GEMINI_API_KEY:-}
 
 MAIL_MAILER=log
 BCRYPT_ROUNDS=12
@@ -57,19 +54,6 @@ echo ".env file created."
 if ! grep -q "APP_KEY=base64:" "$ENV_FILE" || [ -z "$APP_KEY" ]; then
     echo "Generating or fixing APP_KEY..."
     php artisan key:generate --force
-fi
-
-# ─── Ensure SQLite database file exists ──────────────────────────────────────
-DB_PATH=${DB_DATABASE:-/var/data/database.sqlite}
-# Ensure /var/data directory is writable (SQLite needs dir-level write for journal files)
-mkdir -p "$(dirname $DB_PATH)"
-chown -R www-data:www-data "$(dirname $DB_PATH)" 2>/dev/null || true
-chmod -R 775 "$(dirname $DB_PATH)" 2>/dev/null || true
-if [ ! -f "$DB_PATH" ]; then
-    echo "Creating SQLite database at $DB_PATH..."
-    touch "$DB_PATH"
-    chown www-data:www-data "$DB_PATH" 2>/dev/null || true
-    chmod 664 "$DB_PATH" 2>/dev/null || true
 fi
 
 # ─── Storage & cache permissions ─────────────────────────────────────────────
@@ -105,6 +89,18 @@ php artisan config:cache 2>&1 || true
 php artisan view:cache   2>&1 || true
 # Note: route:cache is skipped if closures exist in routes files
 php artisan route:cache  2>&1 || echo "Route caching skipped (closures in routes)"
+
+# ─── Keep-Alive Background Ping (Prevents Render Free Tier Sleep) ─────────
+echo "Starting keep-alive background ping..."
+(
+    while true; do
+        sleep 840  # 14 minutes
+        curl -s -o /dev/null -w "%{http_code}" "${APP_URL:-https://thaaaaaaushvera.onrender.com}/api/health" || true
+        echo "[keep-alive] Pinged at $(date)"
+    done
+) &
+KEEPALIVE_PID=$!
+echo "Keep-alive started (PID: $KEEPALIVE_PID)"
 
 echo "=== Starting Apache ==="
 exec apache2-foreground

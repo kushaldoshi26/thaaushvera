@@ -64,6 +64,175 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 10px rgba(24, 119, 242, 0.4);
     }
+
+    /* Guest landing styles */
+    .guest-landing-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 650px;
+        margin: 50px auto;
+        padding: 0 1rem;
+    }
+    .guest-card {
+        background: #FFFFFF;
+        border-radius: 20px;
+        padding: 3rem;
+        border: 1px solid #E8E2D8;
+        box-shadow: 0 15px 45px rgba(11, 28, 45, 0.05);
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .guest-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(198, 167, 94, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .guest-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .guest-logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .guest-logo img {
+        width: 60px;
+        height: 60px;
+    }
+    .guest-logo h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        color: #0B1C2D;
+        letter-spacing: 2px;
+        margin: 0;
+    }
+    .guest-tagline {
+        font-size: 1.1rem;
+        color: rgba(11, 28, 45, 0.6);
+        font-style: italic;
+    }
+    .guest-tabs {
+        display: flex;
+        border-bottom: 1px solid #E6DFD4;
+        margin-bottom: 2rem;
+        gap: 2rem;
+        justify-content: center;
+    }
+    .guest-tab-btn {
+        background: none;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: rgba(11, 28, 45, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .guest-tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #B8964C;
+        transition: width 0.3s ease;
+    }
+    .guest-tab-btn:hover {
+        color: #B8964C;
+    }
+    .guest-tab-btn.active {
+        color: #0B1C2D;
+        font-weight: 600;
+    }
+    .guest-tab-btn.active::after {
+        width: 100%;
+    }
+    .guest-tab-pane {
+        display: none;
+    }
+    .guest-tab-pane.active {
+        display: block;
+    }
+    .pane-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        color: #0B1C2D;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    .pane-subtitle {
+        font-size: 14px;
+        color: rgba(11, 28, 45, 0.6);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .auth-form-legacy {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .auth-form-legacy.grid-two-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .auth-form-legacy .span-full {
+        grid-column: 1 / -1;
+    }
+    .auth-form-legacy input, 
+    .auth-form-legacy select, 
+    .auth-form-legacy textarea {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        border: 1px solid rgba(198, 167, 94, 0.3);
+        border-radius: 8px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px;
+        color: #0B1C2D;
+        background: #FFF;
+        transition: all 0.3s;
+    }
+    .auth-form-legacy input:focus, 
+    .auth-form-legacy select:focus, 
+    .auth-form-legacy textarea:focus {
+        outline: none;
+        border-color: #B8964C;
+        box-shadow: 0 0 0 3px rgba(184, 150, 76, 0.1);
+    }
+    .guest-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #B8964C, #C6A75E);
+        border: none;
+        color: #FFFFFF;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 0.5rem;
+    }
+    .guest-btn:hover {
+        background: linear-gradient(135deg, #C6A75E, #B8964C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(184, 150, 76, 0.3);
+    }
 </style>
 @endpush
 
@@ -78,7 +247,104 @@
     ✅ {{ session('success') }}
 </div>
 @endif
-<div class="account-container">
+<div id="guestContainer" class="guest-landing-container" style="display: none;">
+    <div class="guest-card">
+        <div class="guest-header">
+            <div class="guest-logo">
+                <img src="{{ asset('assets/img/logo.png') }}" alt="AUSHVERA" onerror="this.style.display='none'">
+                <h2>AUSHVERA</h2>
+            </div>
+            <p class="guest-tagline">Ayurvedic Wellness & Self-Care Portal</p>
+        </div>
+        
+        <!-- Toggle Tabs -->
+        <div class="guest-tabs">
+            <button class="guest-tab-btn active" id="guestTabLoginBtn" onclick="switchGuestTab('login')">Sign In</button>
+            <button class="guest-tab-btn" id="guestTabRegisterBtn" onclick="switchGuestTab('register')">Register</button>
+        </div>
+        
+        <!-- Guest Login Form -->
+        <div class="guest-tab-pane active" id="guestLoginPane">
+            <h3 class="pane-title">Welcome Back</h3>
+            <p class="pane-subtitle">Enter your credentials to access your profile or admin panel.</p>
+            <form id="guestLoginForm" class="auth-form-legacy">
+                <div class="span-full">
+                    <input type="email" id="guestLoginEmail" placeholder="Email Address" required>
+                </div>
+                <div class="span-full">
+                    <input type="password" id="guestLoginPassword" placeholder="Password" required>
+                </div>
+                <div class="span-full" style="text-align: right; margin-bottom: 0.5rem; margin-top: -0.5rem;">
+                    <a href="#" id="guestForgotPasswordLink" style="color: #B8964C; font-size: 13px; text-decoration: none;">Forgot Password?</a>
+                </div>
+                <button type="submit" class="guest-btn">Sign In</button>
+            </form>
+            
+            <div class="social-login-separator">
+                <span>Or continue with</span>
+            </div>
+            <div class="social-login-options">
+                <a href="{{ route('auth.google') }}" class="social-btn google-btn" style="text-decoration: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    Google
+                </a>
+                <a href="{{ route('auth.facebook') }}" class="social-btn facebook-btn" style="text-decoration: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Facebook
+                </a>
+            </div>
+        </div>
+        
+        <!-- Guest Register Form -->
+        <div class="guest-tab-pane" id="guestRegisterPane">
+            <h3 class="pane-title">Create Account</h3>
+            <p class="pane-subtitle">Register to begin your Ayurvedic wellness journey.</p>
+            <form id="guestSignupForm" class="auth-form-legacy grid-two-cols">
+                <div>
+                    <input type="text" id="guestSignupFirstName" placeholder="First Name" required>
+                </div>
+                <div>
+                    <input type="text" id="guestSignupLastName" placeholder="Last Name" required>
+                </div>
+                <div class="span-full">
+                    <input type="email" id="guestSignupEmail" placeholder="Email Address" required>
+                </div>
+                <div class="span-full">
+                    <input type="tel" id="guestSignupPhone" placeholder="Phone Number" required>
+                </div>
+                <div class="span-full">
+                    <input type="password" id="guestSignupPassword" placeholder="Password (min 8 characters)" minlength="8" required>
+                </div>
+                <div>
+                    <input type="date" id="guestSignupDob" placeholder="Date of Birth">
+                </div>
+                <div>
+                    <select id="guestSignupGender">
+                        <option value="">Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="text" id="guestSignupPincode" placeholder="Pin Code" maxlength="6" required>
+                </div>
+                <div>
+                    <input type="text" id="guestSignupCity" placeholder="City" readonly>
+                </div>
+                <div class="span-full">
+                    <input type="text" id="guestSignupState" placeholder="State" readonly>
+                </div>
+                <div class="span-full">
+                    <textarea id="guestSignupAddress" placeholder="Full Address" rows="2"></textarea>
+                </div>
+                <button type="submit" class="guest-btn span-full">Create Account</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="account-container" style="display: none;">
     <!-- Luxury Sidebar -->
     <aside class="account-sidebar">
         <div class="sidebar-header">
@@ -86,7 +352,7 @@
         </div>
         
         <nav class="sidebar-nav">
-            <a href="{{ route('profile') }}" class="nav-item active">
+            <a href="javascript:void(0)" class="nav-item active" data-tab="overview">
                 <span class="nav-indicator"></span>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <circle cx="12" cy="8" r="4"/>
@@ -95,7 +361,7 @@
                 <span class="nav-text">Profile Overview</span>
             </a>
             
-            <a href="#" class="nav-item">
+            <a href="javascript:void(0)" class="nav-item" data-tab="orders">
                 <span class="nav-indicator"></span>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
@@ -103,7 +369,7 @@
                 <span class="nav-text">My Orders</span>
             </a>
             
-            <a href="#" class="nav-item">
+            <a href="javascript:void(0)" class="nav-item" data-tab="addresses">
                 <span class="nav-indicator"></span>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -112,7 +378,7 @@
                 <span class="nav-text">Addresses</span>
             </a>
             
-            <a href="#" class="nav-item">
+            <a href="javascript:void(0)" class="nav-item" data-tab="payment">
                 <span class="nav-indicator"></span>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
@@ -121,7 +387,7 @@
                 <span class="nav-text">Payment Methods</span>
             </a>
             
-            <a href="#" class="nav-item">
+            <a href="javascript:void(0)" class="nav-item" data-tab="wishlist">
                 <span class="nav-indicator"></span>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -129,14 +395,13 @@
                 <span class="nav-text">Wishlist</span>
             </a>
             
-            <a href="#" class="nav-item">
+            <a href="javascript:void(0)" class="nav-item" data-tab="security">
                 <span class="nav-indicator"></span>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
                 <span class="nav-text">Security</span>
             </a>
-
         </nav>
         
         <div class="sidebar-footer">
@@ -154,90 +419,186 @@
     
     <!-- Main Content Preview -->
     <main class="account-main">
-        <div class="content-header">
-            <h1>Profile Overview</h1>
-            <p class="content-subtitle">Manage your personal information and preferences</p>
-        </div>
-        
-        <div class="content-cards">
-            <div class="info-card">
-                <div class="card-header">
-                    <h3>Personal Information</h3>
-                    <button class="edit-btn" id="editBtn">Edit</button>
-                </div>
-                <div class="card-content" id="profileContent">
-                    <div class="info-row">
-                        <span class="info-label">Full Name</span>
-                        <span class="info-value" id="displayName">Guest User</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Email</span>
-                        <span class="info-value" id="displayEmail">Not logged in</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Phone</span>
-                        <span class="info-value" id="displayPhone">Not available</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Date of Birth</span>
-                        <span class="info-value" id="displayDob">Not provided</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Gender</span>
-                        <span class="info-value" id="displayGender">Not provided</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Address</span>
-                        <span class="info-value" id="displayAddress">Not provided</span>
-                    </div>
-                </div>
-                <form class="edit-form" id="editForm" style="display: none;">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="editName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="editEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="tel" id="editPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Date of Birth</label>
-                        <input type="date" id="editDob">
-                    </div>
-                    <div class="form-group">
-                        <label>Gender</label>
-                        <select id="editGender">
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Address</label>
-                        <textarea id="editAddress" rows="3"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="save-btn">Save Changes</button>
-                        <button type="button" class="cancel-btn" id="cancelEdit">Cancel</button>
-                    </div>
-                </form>
+        <!-- Overview Tab -->
+        <div id="tab-overview" class="profile-tab-content active">
+            <div class="content-header">
+                <h1>Profile Overview</h1>
+                <p class="content-subtitle">Manage your personal information and preferences</p>
             </div>
             
-            {{-- ─── Membership / Subscription Card ─── --}}
-            <div class="info-card" id="subscriptionCard">
-                <div class="card-header">
-                    <h3>Membership & Subscription</h3>
-                    <span class="status-badge" id="subBadge" style="display:none;">Active</span>
+            <div class="content-cards">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3>Personal Information</h3>
+                        <button class="edit-btn" id="editBtn">Edit</button>
+                    </div>
+                    <div class="card-content" id="profileContent">
+                        <div class="info-row">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value" id="displayName">Guest User</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value" id="displayEmail">Not logged in</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone</span>
+                            <span class="info-value" id="displayPhone">Not available</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Date of Birth</span>
+                            <span class="info-value" id="displayDob">Not provided</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Gender</span>
+                            <span class="info-value" id="displayGender">Not provided</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Address</span>
+                            <span class="info-value" id="displayAddress">Not provided</span>
+                        </div>
+                    </div>
+                    <form class="edit-form" id="editForm" style="display: none;">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="editName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="editEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="editPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" id="editDob">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="editGender">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <textarea id="editAddress" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="save-btn">Save Changes</button>
+                            <button type="button" class="cancel-btn" id="cancelEdit">Cancel</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="card-content" id="subscriptionContent">
-                    <p style="color: rgba(255,255,255,0.5); font-size:14px; text-align:center; padding:1rem 0;">
-                        Loading subscription info...
-                    </p>
+                
+                {{-- ─── Membership / Subscription Card ─── --}}
+                <div class="info-card" id="subscriptionCard">
+                    <div class="card-header">
+                        <h3>Membership & Subscription</h3>
+                        <span class="status-badge" id="subBadge" style="display:none;">Active</span>
+                    </div>
+                    <div class="card-content" id="subscriptionContent">
+                        <p style="color: rgba(255,255,255,0.5); font-size:14px; text-align:center; padding:1rem 0;">
+                            Loading subscription info...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="tab-orders" class="profile-tab-content" style="display: none;">
+            <div class="content-header">
+                <h1>My Orders</h1>
+                <p class="content-subtitle">Track your purchases and view order history</p>
+            </div>
+            <div class="content-cards">
+                <div class="info-card" style="text-align: center; padding: 3rem 1rem;">
+                    <p style="font-size: 18px; color: rgba(11,28,45,0.6); margin-bottom: 1.5rem;">You haven't placed any orders yet.</p>
+                    <a href="/products" style="display: inline-block; padding: 10px 24px; background: linear-gradient(135deg, #B8964C, #C6A75E); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">Shop Our Collection</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Addresses Tab -->
+        <div id="tab-addresses" class="profile-tab-content" style="display: none;">
+            <div class="content-header">
+                <h1>Addresses</h1>
+                <p class="content-subtitle">Manage your delivery and billing addresses</p>
+            </div>
+            <div class="content-cards">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3>Primary Address</h3>
+                    </div>
+                    <div class="card-content">
+                        <p id="displayPrimaryAddress" style="font-size: 16px; color: #0B1C2D; font-weight: 500;">Not provided yet.</p>
+                        <p style="font-size: 14px; color: rgba(11,28,45,0.5); margin-top: 5px;">Update your address by editing your profile overview.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Tab -->
+        <div id="tab-payment" class="profile-tab-content" style="display: none;">
+            <div class="content-header">
+                <h1>Payment Methods</h1>
+                <p class="content-subtitle">Manage your saved credit/debit cards and other options</p>
+            </div>
+            <div class="content-cards">
+                <div class="info-card" style="text-align: center; padding: 3rem 1rem;">
+                    <p style="font-size: 18px; color: rgba(11,28,45,0.6);">No saved payment methods found.</p>
+                    <p style="font-size: 14px; color: rgba(11,28,45,0.5); margin-top: 5px;">Payment cards can be saved during checkout.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wishlist Tab -->
+        <div id="tab-wishlist" class="profile-tab-content" style="display: none;">
+            <div class="content-header">
+                <h1>My Wishlist</h1>
+                <p class="content-subtitle">Items you've saved to buy later</p>
+            </div>
+            <div class="content-cards">
+                <div class="info-card" style="text-align: center; padding: 3rem 1rem;">
+                    <p style="font-size: 18px; color: rgba(11,28,45,0.6); margin-bottom: 1.5rem;">Your wishlist is empty.</p>
+                    <a href="/products" style="display: inline-block; padding: 10px 24px; background: linear-gradient(135deg, #B8964C, #C6A75E); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">Explore Products</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Tab -->
+        <div id="tab-security" class="profile-tab-content" style="display: none;">
+            <div class="content-header">
+                <h1>Security Settings</h1>
+                <p class="content-subtitle">Update your password to keep your account secure</p>
+            </div>
+            <div class="content-cards">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3>Change Password</h3>
+                    </div>
+                    <form id="changePasswordForm" class="edit-form">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" required placeholder="Enter current password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPasswordInput">New Password</label>
+                            <input type="password" id="newPasswordInput" required minlength="6" placeholder="Enter new password (min. 6 characters)">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmNewPasswordInput">Confirm New Password</label>
+                            <input type="password" id="confirmNewPasswordInput" required minlength="6" placeholder="Confirm new password">
+                        </div>
+                        <div class="form-actions" style="margin-top: 1rem;">
+                            <button type="submit" class="save-btn">Change Password</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

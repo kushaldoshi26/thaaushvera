@@ -57,6 +57,21 @@ class AuthController extends Controller
             // Create token
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            // Sync with standard Laravel web session guard
+            try {
+                \Illuminate\Support\Facades\Auth::login($user, true);
+                session(['admin_token' => $token]);
+            } catch (\Exception $sessionEx) {
+                \Illuminate\Support\Facades\Log::warning('Session login during register failed: ' . $sessionEx->getMessage());
+            }
+
+            // Send registration thank you mail
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\ThankYouMail($user, 'registration'));
+            } catch (\Exception $mailEx) {
+                \Illuminate\Support\Facades\Log::error('Thank you registration mail failed: ' . $mailEx->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'User registered successfully',
@@ -136,6 +151,21 @@ class AuthController extends Controller
             // Create token
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            // Sync with standard Laravel web session guard
+            try {
+                \Illuminate\Support\Facades\Auth::login($user, true);
+                session(['admin_token' => $token]);
+            } catch (\Exception $sessionEx) {
+                \Illuminate\Support\Facades\Log::warning('Session login during login failed: ' . $sessionEx->getMessage());
+            }
+
+            // Send login thank you mail
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\ThankYouMail($user, 'login'));
+            } catch (\Exception $mailEx) {
+                \Illuminate\Support\Facades\Log::error('Thank you login mail failed: ' . $mailEx->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Login successful',
@@ -200,7 +230,18 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            $request->user()->currentAccessToken()->delete();
+            if ($request->user() && $request->user()->currentAccessToken()) {
+                $request->user()->currentAccessToken()->delete();
+            }
+
+            // Also logout Web session
+            try {
+                \Illuminate\Support\Facades\Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            } catch (\Exception $sessionEx) {
+                // Ignore if running outside web context
+            }
 
             return response()->json([
                 'success' => true,
@@ -212,6 +253,50 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Logout failed',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Change password for the authenticated user
+     */
+    public function changePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:6|confirmed',
+            ]);
+
+            $user = $request->user();
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Incorrect current password.',
+                    'errors' => ['current_password' => ['The current password you entered is incorrect.']]
+                ], 422);
+            }
+
+            $user->update([
+                'password' => Hash::make($request->new_password)
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password changed successfully.'
+            ], 200);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(', ', array_map(fn($v) => implode(' ', $v), $e->errors())),
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to change password: ' . $e->getMessage()
             ], 500);
         }
     }

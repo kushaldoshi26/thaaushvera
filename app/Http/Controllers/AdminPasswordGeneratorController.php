@@ -182,7 +182,7 @@ class AdminPasswordGeneratorController extends Controller
                     ->orWhere('email', 'like', "%$term%")
                     ->orWhere('name', 'like', "%$term%");
             })
-            ->select('id', 'admin_id', 'name', 'email', 'admin_role')
+            ->select('id', 'admin_id', 'name', 'email', 'role', 'admin_level')
             ->limit(10)
             ->get();
 

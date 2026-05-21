@@ -192,6 +192,6 @@ class WebController extends Controller
     {
         session()->forget('admin_token');
         \Illuminate\Support\Facades\Auth::logout();
-        return redirect()->route('admin.login')->with('success', 'You have been logged out.');
+        return redirect(url('/profile?intent=admin-login'))->with('success', 'You have been logged out.');
     }
 }

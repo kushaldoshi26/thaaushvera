@@ -29,8 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => 'Unauthorized'
                 ], 401);
             }
-            // For web requests, redirect to admin login
-            return redirect()->route('admin.login')
+            // For web requests, redirect to unified profile page
+            return redirect(url('/profile?intent=admin-login'))
                 ->withErrors(['email' => 'Please log in to access the admin panel.']);
         });
     })->create();

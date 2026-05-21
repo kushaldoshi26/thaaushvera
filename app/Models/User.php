@@ -21,6 +21,34 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 
+    protected $appends = ['admin_role'];
+
+    public function getAdminRoleAttribute()
+    {
+        if ($this->role === 'super_admin') {
+            return 'super_admin';
+        }
+        return match ($this->admin_level) {
+            'super' => 'super_admin',
+            'manager' => 'manager',
+            'staff' => 'support',
+            default => null,
+        };
+    }
+
+    public function setAdminRoleAttribute($value)
+    {
+        if ($value === 'super_admin') {
+            $this->attributes['admin_level'] = 'super';
+        } elseif ($value === 'manager') {
+            $this->attributes['admin_level'] = 'manager';
+        } elseif ($value === 'support') {
+            $this->attributes['admin_level'] = 'staff';
+        } else {
+            $this->attributes['admin_level'] = null;
+        }
+    }
+
     /**
      * The attributes that are mass assignable.
      *

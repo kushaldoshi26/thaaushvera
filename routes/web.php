@@ -41,7 +41,9 @@ Route::get('/auth/facebook/callback', [\App\Http\Controllers\SocialAuthControlle
 // ─── Admin ────────────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
     // Login (public)
-    Route::get('/login', [\App\Http\Controllers\AdminController::class, 'showLogin'])->name('login');
+    Route::get('/login', function() {
+        return redirect(url('/profile?intent=admin-login'));
+    })->name('login');
     Route::post('/login', [\App\Http\Controllers\AdminController::class, 'login'])
         ->name('login.post')
         ->middleware('throttle:5,15');

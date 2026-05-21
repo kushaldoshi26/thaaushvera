@@ -270,11 +270,11 @@ class AdminController extends Controller
     public function loginHistory()
     {
         $history = DB::table('login_history')
-            ->join('users', 'login_history.user_id', '=', 'users.id')
+            ->leftJoin('users', 'login_history.user_id', '=', 'users.id')
             ->select(
-                'users.name',
-                'users.email',
-                'users.role',
+                DB::raw("COALESCE(users.name, 'Deleted User') as name"),
+                DB::raw("COALESCE(users.email, 'N/A') as email"),
+                DB::raw("COALESCE(users.role, 'N/A') as role"),
                 'login_history.login_time',
                 'login_history.ip_address',
                 'login_history.login_method',

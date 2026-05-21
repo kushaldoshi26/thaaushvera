@@ -39,7 +39,7 @@ class AdminMiddleware
             if ($request->expectsJson()) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized. Admin access required.'], 403);
             }
-            return redirect()->route('admin.login')->withErrors(['email' => 'You do not have admin access.']);
+            return redirect(url('/profile?intent=admin-login'))->withErrors(['email' => 'You do not have admin access.']);
         }
 
         // Block deactivated accounts
@@ -48,7 +48,7 @@ class AdminMiddleware
                 return response()->json(['success' => false, 'message' => 'Your account has been deactivated.'], 403);
             }
             Auth::logout();
-            return redirect()->route('admin.login')->withErrors(['email' => 'Your account has been deactivated. Contact super admin.']);
+            return redirect(url('/profile?intent=admin-login'))->withErrors(['email' => 'Your account has been deactivated. Contact super admin.']);
         }
 
         $level = $user->admin_level ?? ($user->role === 'super_admin' ? 'super' : 'staff');

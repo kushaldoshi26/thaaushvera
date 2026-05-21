@@ -6,10 +6,6 @@ services:
     rootDir: .
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
-    disk:
-      name: thaaushvera-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: APP_NAME
         value: AUSHVERA
@@ -22,12 +18,12 @@ services:
       - key: APP_KEY
         generateValue: true
       - key: DB_CONNECTION
-        value: sqlite
-      - key: DB_DATABASE
-        value: /var/data/database.sqlite
+        value: pgsql
+      - key: DATABASE_URL
+        sync: false
       - key: LOG_CHANNEL
         value: stderr
-      # Social Login Placeholders
+      # Social Login
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -40,17 +36,15 @@ services:
         sync: false
       - key: FACEBOOK_REDIRECT_URI
         value: https://thaaaaaaushvera.onrender.com/auth/facebook/callback
-      # Other Config
-      - key: SESSION_DRIVER
-        value: file
-      - key: CACHE_DRIVER
-        value: file
-      # Razorpay Payment Integration
+      # Payment
       - key: RAZORPAY_KEY
         sync: false
       - key: RAZORPAY_SECRET
         sync: false
-      # Email Configuration (SMTP)
+      # AI Chatbot
+      - key: GEMINI_API_KEY
+        sync: false
+      # Email (SMTP)
       - key: MAIL_MAILER
         value: smtp
       - key: MAIL_HOST

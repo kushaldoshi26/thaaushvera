@@ -106,7 +106,7 @@
             </div>
             <div class="chat-messages-area" id="chatMsgsArea"></div>
             <div class="chat-suggestions" id="chatSuggestions">
-                ${SUGGESTIONS.map(s => `<button class="chat-suggestion-btn" onclick="window._aushveraChatSend('${s.replace(/[🛍️📦🌿⭐📞]/gu,'').trim()}')">${s}</button>`).join('')}
+                ${SUGGESTIONS.map(s => '<button class="chat-suggestion-btn" onclick="window._aushveraChatSend(\'' + s.replace(/[🛍️📦🌿⭐📞]/gu, '').trim() + '\')">' + s + '</button>').join('')}
             </div>
             <div class="chat-input-area">
                 <textarea id="chatBotInput" rows="1" placeholder="Ask about products, wellness, orders..."></textarea>

@@ -16,7 +16,7 @@ var api = {
         };
         if (includeAuth) {
             const token = this.getToken();
-            if (token) headers['Authorization'] = `Bearer ${token}`;
+            if (token && token !== 'session_auth') headers['Authorization'] = `Bearer ${token}`;
         }
         return headers;
     },

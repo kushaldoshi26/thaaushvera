@@ -9,12 +9,13 @@ RUN npm run build
 # Stage 2: Serve application
 FROM php:8.2-apache
 
-# Install PHP extensions needed by Laravel
+# Install PHP extensions needed by Laravel (SQLite + PostgreSQL)
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev \
     libzip-dev zip unzip git curl libsqlite3-dev \
+    libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd zip pdo pdo_sqlite pdo_mysql opcache \
+    && docker-php-ext-install gd zip pdo pdo_sqlite pdo_mysql pdo_pgsql opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite for clean URLs
@@ -40,12 +41,6 @@ RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions \
 
 # Install PHP dependencies (no dev)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Set up SQLite database (directory must also be writable for journal/WAL files)
-RUN mkdir -p /var/data \
-    && touch /var/data/database.sqlite \
-    && chown -R www-data:www-data /var/data \
-    && chmod -R 775 /var/data
 
 # Configure Apache to serve Laravel's public folder
 COPY docker/apache-laravel.conf /etc/apache2/sites-available/000-default.conf

@@ -125,8 +125,10 @@ Route::get('/logs', function() {
 Route::get('/banners', [BannerController::class, 'index']);
 
 // Public auth routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('web')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 Route::post('/admin/register', [AdminRegisterController::class, 'register']);
 
 // OAuth routes (public)
@@ -155,11 +157,12 @@ Route::post('/email/otp/verify',       [\App\Http\Controllers\EmailController::c
 Route::post('/email/forgot-password',  [\App\Http\Controllers\EmailController::class, 'sendPasswordResetOtp']);
 Route::post('/email/reset-password',   [\App\Http\Controllers\EmailController::class, 'resetPassword']);
 
-// Protected routes (require auth:sanctum)
-Route::middleware('auth:sanctum')->group(function () {
+// Protected routes (require auth:sanctum or web session)
+Route::middleware(['web', 'auth:sanctum,web'])->group(function () {
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
     
     // OAuth account management (authenticated users)
     Route::post('/oauth/link', [OAuthController::class, 'linkOAuthAccount']);
@@ -194,8 +197,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/subscription/history', [\App\Http\Controllers\UserSubscriptionController::class, 'history']);
 });
 
-// Protected admin routes (require auth:sanctum + admin role)
-Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+// Protected admin routes (require session or token + admin role)
+Route::middleware(['web', 'auth:sanctum,web', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
 
     // User management

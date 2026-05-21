@@ -81,11 +81,23 @@ function updateProfileDisplay() {
 // Update UI based on login status
 function updateAuthUI() {
     const authText = document.getElementById('authText');
+    const guestContainer = document.getElementById('guestContainer');
+    const accountContainer = document.querySelector('.account-container');
     
     if (isLoggedIn && userData.name) {
         if (authText) authText.textContent = 'Logout';
+        if (guestContainer) guestContainer.style.display = 'none';
+        if (accountContainer) accountContainer.style.display = 'grid';
+        
+        // Populate primary address under Addresses tab
+        const displayPrimaryAddress = document.getElementById('displayPrimaryAddress');
+        if (displayPrimaryAddress) {
+            displayPrimaryAddress.textContent = userData.address || 'No address provided yet.';
+        }
     } else {
         if (authText) authText.textContent = 'Login';
+        if (guestContainer) guestContainer.style.display = 'flex';
+        if (accountContainer) accountContainer.style.display = 'none';
     }
     updateProfileDisplay();
 }
@@ -226,6 +238,7 @@ async function handleAuthClick(event) {
             isLoggedIn = false;
             updateAuthUI();
             alert('Logged out successfully!');
+            window.location.reload();
         }
     } else {
         // Show login modal
@@ -259,7 +272,13 @@ loginForm.addEventListener('submit', async (e) => {
         loginForm.reset();
         
         alert('Login successful!');
-        window.location.reload();
+        
+        // Redirect if admin
+        if (userData.role === 'admin' || userData.role === 'super_admin') {
+            window.location.href = '/admin';
+        } else {
+            window.location.reload();
+        }
     } catch (error) {
         alert(error.message || 'Login failed');
     }
@@ -457,4 +476,240 @@ if (newPasswordForm) {
 // Close forgot on outside click
 window.addEventListener('click', (e) => {
     if (e.target === forgotModal) forgotModal.classList.remove('active');
+});
+
+// ── Tab Switching ────────────────────────────────────────────────────────────
+const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+const tabContents = document.querySelectorAll('.profile-tab-content');
+
+if (navItems.length > 0) {
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetTab = item.getAttribute('data-tab');
+            if (!targetTab) return;
+            
+            // Deactivate all nav items
+            navItems.forEach(nav => nav.classList.remove('active'));
+            // Activate clicked item
+            item.classList.add('active');
+            
+            // Hide all tab contents
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.display = 'none';
+            });
+            
+            // Show targeted tab content
+            const activeTabContent = document.getElementById(`tab-${targetTab}`);
+            if (activeTabContent) {
+                activeTabContent.classList.add('active');
+                activeTabContent.style.display = 'block';
+            }
+        });
+    });
+}
+
+// ── Guest Tab Switching ──────────────────────────────────────────────────────
+function switchGuestTab(tab) {
+    const loginBtn = document.getElementById('guestTabLoginBtn');
+    const registerBtn = document.getElementById('guestTabRegisterBtn');
+    const loginPane = document.getElementById('guestLoginPane');
+    const registerPane = document.getElementById('guestRegisterPane');
+    
+    if (tab === 'login') {
+        if (loginBtn) loginBtn.classList.add('active');
+        if (registerBtn) registerBtn.classList.remove('active');
+        if (loginPane) loginPane.classList.add('active');
+        if (registerPane) registerPane.classList.remove('active');
+    } else if (tab === 'register') {
+        if (loginBtn) loginBtn.classList.remove('active');
+        if (registerBtn) registerBtn.classList.add('active');
+        if (loginPane) loginPane.classList.remove('active');
+        if (registerPane) registerPane.classList.add('active');
+    }
+}
+window.switchGuestTab = switchGuestTab;
+
+// ── Guest Login & Signup Handlers ─────────────────────────────────────────────
+const guestLoginForm = document.getElementById('guestLoginForm');
+if (guestLoginForm) {
+    guestLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('guestLoginEmail').value;
+        const password = document.getElementById('guestLoginPassword').value;
+        
+        try {
+            const response = await api.login(email, password);
+            localStorage.setItem('auth_token', response.data.token);
+            localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+            
+            // Clear popup flag so it won't re-show after login
+            sessionStorage.removeItem('login_popup_shown');
+            
+            userData = response.data.user;
+            isLoggedIn = true;
+
+            updateAuthUI();
+            guestLoginForm.reset();
+            
+            alert('Login successful!');
+            
+            // Check role and redirect if admin
+            if (userData.role === 'admin' || userData.role === 'super_admin') {
+                window.location.href = '/admin';
+            } else {
+                window.location.reload();
+            }
+        } catch (error) {
+            alert(error.message || 'Login failed');
+        }
+    });
+}
+
+const guestSignupForm = document.getElementById('guestSignupForm');
+if (guestSignupForm) {
+    guestSignupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const firstName = document.getElementById('guestSignupFirstName').value;
+        const lastName = document.getElementById('guestSignupLastName').value;
+        const email = document.getElementById('guestSignupEmail').value;
+        const phone = document.getElementById('guestSignupPhone').value;
+        const password = document.getElementById('guestSignupPassword').value;
+        const dob = document.getElementById('guestSignupDob').value;
+        const gender = document.getElementById('guestSignupGender').value;
+        const pincode = document.getElementById('guestSignupPincode').value;
+        const city = document.getElementById('guestSignupCity').value;
+        const state = document.getElementById('guestSignupState').value;
+        const address = document.getElementById('guestSignupAddress').value;
+        
+        try {
+            const response = await api.register({
+                name: `${firstName} ${lastName}`,
+                email,
+                password,
+                password_confirmation: password,
+                phone,
+                dob,
+                gender,
+                pincode,
+                city,
+                state,
+                address
+            });
+            
+            alert('Account created successfully! Please login.');
+            switchGuestTab('login');
+            const guestLoginEmail = document.getElementById('guestLoginEmail');
+            if (guestLoginEmail) guestLoginEmail.value = email;
+            guestSignupForm.reset();
+        } catch (error) {
+            alert(error.message || 'Registration failed');
+        }
+    });
+}
+
+// ── Guest Pin code lookup functionality ──────────────────────────────────────
+const guestSignupPincode = document.getElementById('guestSignupPincode');
+const guestSignupCity = document.getElementById('guestSignupCity');
+const guestSignupState = document.getElementById('guestSignupState');
+
+if (guestSignupPincode) {
+    guestSignupPincode.addEventListener('input', async (e) => {
+        const pincode = e.target.value;
+        if (pincode.length === 6) {
+            try {
+                const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+                const data = await response.json();
+                if (data[0].Status === 'Success') {
+                    const postOffice = data[0].PostOffice[0];
+                    guestSignupCity.value = postOffice.District;
+                    guestSignupState.value = postOffice.State;
+                } else {
+                    guestSignupCity.value = '';
+                    guestSignupState.value = '';
+                    alert('Invalid pin code');
+                }
+            } catch (error) {
+                console.error('Error fetching pin code data:', error);
+            }
+        }
+    });
+}
+
+// ── Guest Forgot Password Link ───────────────────────────────────────────────
+const guestForgotLink = document.getElementById('guestForgotPasswordLink');
+if (guestForgotLink) {
+    guestForgotLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        forgotModal.classList.add('active');
+        document.getElementById('forgotStep1').style.display = '';
+        document.getElementById('forgotStep2').style.display = 'none';
+        document.getElementById('forgotStep3').style.display = 'none';
+    });
+}
+
+// ── Security Tab: Change Password Form ───────────────────────────────────────
+const changePasswordForm = document.getElementById('changePasswordForm');
+if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPasswordInput').value;
+        const confirmNewPassword = document.getElementById('confirmNewPasswordInput').value;
+        
+        if (newPassword !== confirmNewPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
+        if (newPassword.length < 6) {
+            alert('New password must be at least 6 characters.');
+            return;
+        }
+        
+        try {
+            const response = await api.request('/change-password', {
+                method: 'POST',
+                auth: true,
+                body: {
+                    current_password: currentPassword,
+                    new_password: newPassword,
+                    new_password_confirmation: confirmNewPassword
+                }
+            });
+            
+            if (response.success) {
+                alert('🎉 Password changed successfully!');
+                changePasswordForm.reset();
+            } else {
+                alert(response.message || 'Failed to change password');
+            }
+        } catch (error) {
+            alert(error.message || error.errors?.current_password?.[0] || 'An error occurred while changing password.');
+        }
+    });
+}
+
+// ── Unified Login Intent & DOM Load Initialization ─────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('intent') === 'admin-login') {
+        if (isLoggedIn && (userData.role === 'admin' || userData.role === 'super_admin')) {
+            // Already logged in as admin — redirect immediately to admin dashboard
+            window.location.href = '/admin';
+        } else {
+            // Focus on Sign In/Login tab on guest landing view
+            switchGuestTab('login');
+            
+            // Also display the login modal with a subtle hint that this is for admin access
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.classList.add('active');
+                const title = modal.querySelector('h2, h3, .modal-title');
+                if (title) title.textContent = '🔐 Admin Login';
+            }
+        }
+    }
 });

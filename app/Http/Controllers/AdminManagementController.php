@@ -12,7 +12,7 @@ class AdminManagementController extends Controller
     public function index()
     {
         $admins = User::where('role', 'admin')
-            ->select('id', 'name', 'email', 'admin_role', 'is_active', 'last_login_at', 'created_at')
+            ->select('id', 'name', 'email', 'role', 'admin_level', 'is_active', 'last_login_at', 'created_at')
             ->orderBy('created_at', 'desc')
             ->get();
 
