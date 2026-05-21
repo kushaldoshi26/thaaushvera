@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ asset('profile-styles.css') }}?v={{ time() }}">
 <style>
     .social-login-separator {
-        display: flex;
+        display: none;
         align-items: center;
         text-align: center;
         margin: 1.5rem 0 1rem;
@@ -23,7 +23,7 @@
         padding: 0 10px;
     }
     .social-login-options {
-        display: flex;
+        display: none;
         gap: 1rem;
         margin-bottom: 1.5rem;
     }

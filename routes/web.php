@@ -24,6 +24,7 @@ Route::get('/product', [WebController::class, 'product'])->name('product');
 // Cart & Checkout
 Route::get('/cart', [WebController::class, 'cart'])->name('cart');
 Route::get('/checkout', [WebController::class, 'cart'])->name('checkout'); // Checkout uses same cart view
+Route::get('/payment', [WebController::class, 'payment'])->name('payment');
 
 // Legal
 Route::get('/terms', [WebController::class, 'terms'])->name('terms');

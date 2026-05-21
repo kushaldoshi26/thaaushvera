@@ -117,9 +117,9 @@
             </div>
 
             <div class="action-buttons">
-                <button class="buy-now-btn" onclick="buyNow()">ADD TO CART</button>
+                <button class="buy-now-btn" onclick="addToCart(false)" style="background: var(--navy-deep);">ADD TO CART</button>
             </div>
-            <button class="add-to-cart-btn-full" onclick="buyNow()" style="background: var(--navy-deep);">BUY NOW</button>
+            <button class="add-to-cart-btn-full" onclick="addToCart(true)">BUY NOW</button>
 
             <div class="delivery-info">
                 <div class="delivery-item">
@@ -249,14 +249,15 @@
         }
     }
 
-    function buyNow() {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    async function addToCart(redirect = false) {
         const quantity = parseInt(document.getElementById('quantity').value);
         const productId = '{{ $product->id ?? '' }}';
         
         if(!productId) return;
-        
-        const existing = cart.find(i => i.id === productId);
+
+        // Save to LocalStorage cart as fallback for UI
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const existing = cart.find(i => i.id == productId);
         if (existing) {
             existing.quantity = (existing.quantity || 1) + quantity;
         } else {
@@ -268,10 +269,23 @@
                 quantity: quantity
             });
         }
-        
         localStorage.setItem('cart', JSON.stringify(cart));
         window.dispatchEvent(new Event('cart-updated'));
-        window.location.href = "{{ route('cart') }}";
+
+        // If user is logged in, sync to server
+        if (typeof api !== 'undefined' && api.getToken && api.getToken()) {
+            try {
+                await api.addToCart(productId, quantity);
+            } catch (e) {
+                console.error('Failed to sync cart with server', e);
+            }
+        }
+
+        if (redirect) {
+            window.location.href = "{{ route('cart') }}";
+        } else {
+            alert('Added to cart successfully!');
+        }
     }
 
     // ─── Star Rating ───

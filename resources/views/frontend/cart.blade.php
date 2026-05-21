@@ -311,12 +311,48 @@
         renderCart();
     }
     
-    function proceedToCheckout() {
-        if(window.location.href.includes('127.0.0.1')) {
-            window.location.href = paymentRoute;
-        } else {
-             // Let user try default path, could be relative
-             window.location.href = paymentRoute;
+    async function proceedToCheckout() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (cart.length === 0) {
+            alert('Your cart is empty');
+            return;
+        }
+
+        // Must be logged in
+        if (typeof api === 'undefined' || !api.getToken || !api.getToken()) {
+            alert('Please sign in to proceed to checkout.');
+            window.location.href = '/login';
+            return;
+        }
+
+        const btn = document.querySelector('.btn-gold');
+        const oldText = btn.textContent;
+        btn.textContent = 'Processing...';
+        btn.disabled = true;
+
+        try {
+            // First, sync local cart to server (clear old cart then add items)
+            try { await api.clearCart(); } catch(e) {}
+            
+            for (const item of cart) {
+                await api.addToCart(item.id, item.quantity || 1);
+            }
+
+            // Create Order
+            const response = await api.checkout();
+            
+            if (response.success && response.data && response.data.id) {
+                localStorage.removeItem('cart');
+                window.location.href = `/payment?id=${response.data.id}&amount=${localStorage.getItem('orderTotal')}`;
+            } else {
+                alert(response.message || 'Failed to create order');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Checkout error. Please try again.');
+        } finally {
+            btn.textContent = oldText;
+            btn.disabled = false;
         }
     }
 

@@ -61,6 +61,7 @@
             <li><a href="{{ route('ritual') }}" class="{{ request()->routeIs('ritual') ? 'active' : '' }}">Ritual</a></li>
             <li><a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a></li>
             <li><a href="{{ route('cart') }}" class="{{ request()->routeIs('cart') ? 'active' : '' }}">Cart</a></li>
+            <li><a href="{{ route('profile') }}" class="{{ request()->routeIs('profile') ? 'active' : '' }}">Login / Profile</a></li>
         </ul>
     </div>
     <div class="nav-overlay" id="navOverlay"></div>

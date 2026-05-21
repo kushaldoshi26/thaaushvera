@@ -114,6 +114,11 @@ class WebController extends Controller
         return view('frontend.cart');
     }
 
+    public function payment()
+    {
+        return view('frontend.payment');
+    }
+
     public function profile()
     {
         try {
