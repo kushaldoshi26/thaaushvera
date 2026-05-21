@@ -200,31 +200,38 @@
 </style>
 
 <script>
-    // Intercept global fetch to force same-origin credentials and strip any Authorization headers, forcing Laravel to rely on the secure admin web session cookie.
+    // Intercept global fetch: force same-origin credentials (session cookies) and
+    // strip only the fake 'Bearer session_auth' placeholder token — real Sanctum
+    // admin tokens (stored as auth_token in localStorage) are preserved so that
+    // product add/delete and other admin API calls authenticate correctly.
     const originalFetch = window.fetch;
     window.fetch = function (input, init) {
         init = init || {};
-        init.credentials = 'same-origin'; // Force session cookies to be sent
+        init.credentials = 'same-origin'; // Send session cookies on every request
 
-        // Strip any Authorization headers to avoid Sanctum conflicts with customer tokens or stale local storage tokens
+        // Only strip the fake placeholder, not real bearer tokens
         if (init.headers) {
             if (init.headers instanceof Headers) {
-                init.headers.delete('Authorization');
-                init.headers.delete('authorization');
+                const auth = init.headers.get('Authorization') || init.headers.get('authorization');
+                if (auth === 'Bearer session_auth') {
+                    init.headers.delete('Authorization');
+                    init.headers.delete('authorization');
+                }
             } else if (typeof init.headers === 'object') {
-                delete init.headers['Authorization'];
-                delete init.headers['authorization'];
+                const auth = init.headers['Authorization'] || init.headers['authorization'];
+                if (auth === 'Bearer session_auth') {
+                    delete init.headers['Authorization'];
+                    delete init.headers['authorization'];
+                }
             }
         }
 
-        // Auto-inject CSRF token for non-GET requests in the admin panel if missing
+        // Auto-inject CSRF token for non-GET/HEAD requests if missing
         const method = (init.method || 'GET').toUpperCase();
         if (method !== 'GET' && method !== 'HEAD') {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             if (csrfToken) {
-                if (!init.headers) {
-                    init.headers = {};
-                }
+                if (!init.headers) { init.headers = {}; }
                 if (init.headers instanceof Headers) {
                     if (!init.headers.has('X-CSRF-TOKEN')) {
                         init.headers.set('X-CSRF-TOKEN', csrfToken);

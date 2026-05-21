@@ -16,10 +16,14 @@ class WebController extends Controller
 {
     public function home()
     {
-        $products = Product::with('category')
-            ->latest()
-            ->take(4)
-            ->get();
+        try {
+            $products = Product::with('category')
+                ->latest()
+                ->take(4)
+                ->get();
+        } catch (\Exception $e) {
+            $products = collect();
+        }
         return view('frontend.home', compact('products'));
     }
 
