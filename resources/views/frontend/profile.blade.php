@@ -426,21 +426,21 @@
         
         if (validToken && validUser) {
             if (authText) authText.textContent = 'Logout';
-        } else {
-            if (authText) authText.textContent = 'Login';
-        }
-    })();
-    
-    // Check if admin and redirect
-    (function checkAdminRedirect() {
-        const userStr = localStorage.getItem('currentUser');
-        if(userStr) {
+            // Show admin panel link if admin
             try {
-                const user = JSON.parse(userStr);
-                if (user.role === 'admin' || user.role === 'super_admin') {
-                    window.location.href = '/admin';
+                const u = JSON.parse(validUser);
+                if (u.role === 'admin' || u.role === 'super_admin') {
+                    const adminLink = document.getElementById('adminPanelLink');
+                    if (adminLink) adminLink.style.display = '';
                 }
             } catch(e) {}
+        } else {
+            if (authText) authText.textContent = 'Login';
+            // Auto-show login modal when not logged in
+            setTimeout(() => {
+                const modal = document.getElementById('loginModal');
+                if (modal) modal.classList.add('active');
+            }, 300);
         }
     })();
     

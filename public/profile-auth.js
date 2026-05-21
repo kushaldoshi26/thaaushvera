@@ -249,14 +249,19 @@ loginForm.addEventListener('submit', async (e) => {
         userData = response.data.user;
         isLoggedIn = true;
 
+        // Store and reload — admin link will show in sidebar automatically
+        updateAuthUI();
+        loginModal.classList.remove('active');
+        loginForm.reset();
+        
         if (userData.role === 'admin' || userData.role === 'super_admin') {
-            window.location.href = '/admin';
-        } else {
-            updateAuthUI();
-            loginModal.classList.remove('active');
-            loginForm.reset();
-            alert('Login successful!');
+            // Show admin link in sidebar
+            const adminLink = document.getElementById('adminPanelLink');
+            if (adminLink) adminLink.style.display = '';
         }
+        
+        alert('Login successful!');
+        window.location.reload();
     } catch (error) {
         alert(error.message || 'Login failed');
     }
