@@ -20,106 +20,7 @@ use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\AdminPasswordGeneratorController;
 use App\Http\Controllers\OTPController;
 
-// Debug endpoint to inspect request payloads
-Route::post('/debug', function(Request $request) {
-    return response()->json([
-        'all' => $request->all(),
-        'content' => $request->getContent(),
-        'headers' => $request->headers->all(),
-    ]);
-});
 
-// Health check endpoint with deep schema validation
-Route::get('/health', function() {
-    try {
-        $dbConnected = false;
-        try {
-            \DB::connection()->getPdo();
-            $dbConnected = true;
-        } catch (\Exception $e) {
-            $dbError = $e->getMessage();
-        }
-
-        $tableExists = \Schema::hasTable('users');
-        $requiredColumns = [
-            'name', 'email', 'password', 'role', 
-            'phone', 'dob', 'gender', 'pincode', 
-            'city', 'state', 'address',
-            'oauth_provider', 'oauth_id', 'is_active', 'last_login_at'
-        ];
-        
-        $missingColumns = [];
-        $existingColumns = [];
-        if ($tableExists) {
-            foreach ($requiredColumns as $column) {
-                if (\Schema::hasColumn('users', $column)) {
-                    $existingColumns[] = $column;
-                } else {
-                    $missingColumns[] = $column;
-                }
-            }
-        }
-        
-        $status = ($dbConnected && $tableExists && count($missingColumns) === 0) ? 'healthy' : 'degraded';
-        
-        return response()->json([
-            'status' => $status,
-            'database' => [
-                'connected' => $dbConnected,
-                'error' => $dbError ?? null,
-            ],
-            'table_users' => [
-                'exists' => $tableExists,
-                'schema_status' => count($missingColumns) === 0 ? 'complete' : 'incomplete',
-                'missing_columns' => $missingColumns,
-                'existing_columns' => $existingColumns,
-            ],
-            'environment' => [
-                'app_key_set' => config('app.key') ? true : false,
-                'debug_mode' => config('app.debug'),
-                'url' => config('app.url'),
-            ],
-            'timestamp' => now()->toIso8601String(),
-        ], $status === 'healthy' ? 200 : 500);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'critical_error',
-            'message' => $e->getMessage(),
-            'timestamp' => now()->toIso8601String()
-        ], 500);
-    }
-});
-
-// TEMPORARY: Detailed health audit for all tables
-Route::get('/detailed-health', function() {
-    $tables = ['users', 'carts', 'cart_items', 'products', 'categories', 'orders', 'order_items', 'reviews', 'banners', 'coupons'];
-    $report = [];
-    
-    foreach ($tables as $table) {
-        $exists = \Schema::hasTable($table);
-        $report[$table] = [
-            'exists' => $exists,
-            'count' => $exists ? \DB::table($table)->count() : 0,
-        ];
-    }
-    
-    return response()->json($report);
-});
-
-// TEMPORARY: Log viewer to identify 500 errors on Render
-Route::get('/logs', function() {
-    $logPath = storage_path('logs/laravel.log');
-    if (!file_exists($logPath)) {
-        return response()->json(['message' => 'Log file not found at ' . $logPath]);
-    }
-    
-    $logs = shell_exec('tail -n 100 ' . escapeshellarg($logPath));
-    return response()->json([
-        'path' => $logPath,
-        'last_100_lines' => explode("\n", $logs)
-    ]);
-});
 
 // Public banner routes
 Route::get('/banners', [BannerController::class, 'index']);
@@ -129,7 +30,9 @@ Route::middleware('web')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 });
-Route::post('/admin/register', [AdminRegisterController::class, 'register']);
+Route::middleware(['web', 'auth:sanctum,web', 'admin'])->group(function () {
+    Route::post('/admin/register', [AdminRegisterController::class, 'register']);
+});
 
 // OAuth routes (public)
 Route::post('/oauth/callback', [OAuthController::class, 'handleGoogleCallback']);
@@ -304,3 +207,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payment/verify', [\App\Http\Controllers\PaymentController::class, 'verifyPayment']);
 });
 Route::post('/payment/webhook', [\App\Http\Controllers\PaymentController::class, 'webhook']);
+Route::middleware('auth:sanctum')->put('/profile', [AuthController::class, 'updateProfile']);

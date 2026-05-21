@@ -229,6 +229,58 @@ class AuthController extends Controller
     }
 
     /**
+     * Update current user profile
+     */
+    public function updateProfile(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'phone' => 'nullable|string|max:20',
+                'dob' => 'nullable|date',
+                'gender' => 'nullable|string|in:Male,Female,Other',
+                'address' => 'nullable|string',
+                'city' => 'nullable|string|max:100',
+                'state' => 'nullable|string|max:100',
+                'pincode' => 'nullable|string|max:20',
+            ]);
+
+            $user->update($validated);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'phone' => $user->phone,
+                    'city' => $user->city,
+                    'state' => $user->state,
+                    'gender' => $user->gender,
+                    'dob' => $user->dob,
+                    'pincode' => $user->pincode,
+                    'address' => $user->address,
+                ]
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Update failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Logout user
      */
     public function logout(Request $request)

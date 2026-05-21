@@ -158,25 +158,41 @@ cancelEdit.addEventListener('click', () => {
 });
 
 // Save edited profile
-editForm.addEventListener('submit', (e) => {
+editForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    userData.name = editName.value;
-    userData.email = editEmail.value;
-    userData.phone = editPhone.value;
-    userData.dob = editDob.value;
-    userData.gender = editGender.value;
-    userData.address = editAddress.value;
-    
-    localStorage.setItem('currentUser', JSON.stringify(userData));
-    updateProfileDisplay();
-    
-    profileContent.style.display = 'block';
-    editForm.style.display = 'none';
-    editBtn.textContent = 'Edit';
-    editBtn.disabled = false;
-    
-    alert('Profile updated successfully!');
+    editBtn.textContent = 'Saving...';
+    editBtn.disabled = true;
+
+    const payload = {
+        name: editName.value,
+        email: editEmail.value, // Backend may ignore email updates for security
+        phone: editPhone.value,
+        dob: editDob.value,
+        gender: editGender.value,
+        address: editAddress.value
+    };
+
+    try {
+        const response = await api.updateProfile(payload);
+        if (response.success && response.data) {
+            userData = response.data;
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            updateProfileDisplay();
+            
+            profileContent.style.display = 'block';
+            editForm.style.display = 'none';
+            alert('Profile updated successfully!');
+        } else {
+            alert(response.message || 'Failed to update profile.');
+        }
+    } catch (error) {
+        console.error('Profile update error:', error);
+        alert(error.message || 'An error occurred while updating profile.');
+    } finally {
+        editBtn.textContent = 'Edit';
+        editBtn.disabled = false;
+    }
 });
 
 

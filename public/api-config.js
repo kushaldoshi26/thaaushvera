@@ -94,6 +94,14 @@ var api = {
         return this.request('/user', { auth: true });
     },
 
+    async updateProfile(data) {
+        return this.request('/profile', {
+            method: 'PUT',
+            auth: true,
+            body: data
+        });
+    },
+
     // Products
     async getProducts(params = {}) {
         const query = new URLSearchParams(params).toString();

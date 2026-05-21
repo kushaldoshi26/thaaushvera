@@ -28,8 +28,14 @@ Route::get('/checkout', [WebController::class, 'cart'])->name('checkout'); // Ch
 // Legal
 Route::get('/terms', [WebController::class, 'terms'])->name('terms');
 
-// Profile
+// Profile & Auth Redirects
 Route::get('/profile', [WebController::class, 'profile'])->name('profile');
+Route::get('/login', function() {
+    return redirect(url('/profile?intent=login'));
+})->name('login');
+Route::get('/register', function() {
+    return redirect(url('/profile?intent=register'));
+})->name('register');
 
 // Social Auth
 Route::get('/auth/google', [\App\Http\Controllers\SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
