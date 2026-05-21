@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap');
 
+/* ── Scoped profile page wrapper ────────────────────────────────── */
 .account-container, .guest-landing-container {
     color: #0B1C2D;
     font-family: 'Cormorant Garamond', serif;
@@ -15,6 +16,7 @@
     padding: 2rem;
 }
 
+/* ── Account Sidebar ────────────────────────────────────────────── */
 .account-sidebar {
     background: #FFFFFF;
     border-radius: 20px;
@@ -41,6 +43,7 @@
     text-transform: uppercase;
 }
 
+/* ── Sidebar Navigation (scoped to avoid global nav conflicts) ── */
 .sidebar-nav {
     display: flex;
     flex-direction: column;
@@ -52,9 +55,15 @@
     list-style: none;
     background: #FFFFFF;
     box-shadow: none;
+    /* Override global nav styles that bleed in */
+    width: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
 }
 
-.nav-item {
+.sidebar-nav .nav-item {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -72,50 +81,59 @@
     border-left: 3px solid transparent;
 }
 
-.nav-indicator {
+.sidebar-nav .nav-indicator {
     display: none;
 }
 
-.nav-icon {
+.sidebar-nav .nav-icon {
     width: 20px;
     height: 20px;
     stroke: #1C1C1C;
+    color: #1C1C1C;
     transition: all 0.3s ease;
     flex-shrink: 0;
+    display: inline-block;
 }
 
-.nav-text {
+.sidebar-nav .nav-text {
     transition: all 0.3s ease;
+    color: #1C1C1C;
+    font-size: 15px;
+    text-transform: none;
+    letter-spacing: 0.3px;
 }
 
-.nav-item:hover {
+.sidebar-nav .nav-item:hover {
     background: #F5EFE6;
     color: #C6A45C;
 }
 
-.nav-item:hover .nav-text {
+.sidebar-nav .nav-item:hover .nav-text {
     color: #C6A45C;
 }
 
-.nav-item:hover .nav-icon {
+.sidebar-nav .nav-item:hover .nav-icon {
     stroke: #C6A45C;
+    color: #C6A45C;
 }
 
-.nav-item.active {
+.sidebar-nav .nav-item.active {
     background: #F5EFE6;
     border-left: 3px solid #C6A45C;
     color: #C6A45C;
     font-weight: 500;
 }
 
-.nav-item.active .nav-icon {
+.sidebar-nav .nav-item.active .nav-icon {
     stroke: #C6A45C;
+    color: #C6A45C;
 }
 
-.nav-item.active .nav-text {
+.sidebar-nav .nav-item.active .nav-text {
     color: #1C1C1C;
 }
 
+/* ── Sidebar Footer ─────────────────────────────────────────────── */
 .sidebar-footer {
     margin-top: 40px;
     padding-top: 30px;
@@ -124,7 +142,7 @@
     z-index: 1;
 }
 
-.footer-divider {
+.sidebar-footer .footer-divider {
     display: none;
 }
 
@@ -176,6 +194,7 @@
     stroke: #C6A45C;
 }
 
+/* ── Account Main Content ───────────────────────────────────────── */
 .account-main {
     background: #FFFFFF;
     border-radius: 16px;
@@ -334,6 +353,7 @@
     font-weight: 400;
 }
 
+/* ── Auth Modal (Login / Signup / Forgot Password popups) ─────── */
 .auth-modal {
     display: none;
     position: fixed;
@@ -484,6 +504,7 @@
     color: #C6A75E;
 }
 
+/* ── Edit Form ──────────────────────────────────────────────────── */
 .edit-form {
     display: flex;
     flex-direction: column;
@@ -564,6 +585,7 @@
     border-color: #B8964C;
 }
 
+/* ── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
     .account-container {
         grid-template-columns: 1fr;

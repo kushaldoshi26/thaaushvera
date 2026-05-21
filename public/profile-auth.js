@@ -83,6 +83,7 @@ function updateAuthUI() {
     const authText = document.getElementById('authText');
     const guestContainer = document.getElementById('guestContainer');
     const accountContainer = document.querySelector('.account-container');
+    const loginModal = document.getElementById('loginModal');
     
     if (isLoggedIn && userData.name) {
         if (authText) authText.textContent = 'Logout';
@@ -96,8 +97,12 @@ function updateAuthUI() {
         }
     } else {
         if (authText) authText.textContent = 'Login';
-        if (guestContainer) guestContainer.style.display = 'flex';
+        if (guestContainer) guestContainer.style.display = 'none';
         if (accountContainer) accountContainer.style.display = 'none';
+        // Show login popup instead of inline guest form
+        if (loginModal && !loginModal.classList.contains('active')) {
+            loginModal.classList.add('active');
+        }
     }
     updateProfileDisplay();
 }
