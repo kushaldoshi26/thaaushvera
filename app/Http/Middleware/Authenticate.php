@@ -18,8 +18,8 @@ class Authenticate extends Middleware
             return null;
         }
 
-        // For web requests, redirect to login
-        return route('login');
+        // For web requests, redirect to admin login
+        return route('admin.login');
     }
 
     /**
