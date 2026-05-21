@@ -105,7 +105,7 @@ async function updateReview(id, status) {
     try {
         const res = await fetch(`/api/admin/reviews/${id}/status`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) },
             body: JSON.stringify({ status })
         });
         if (res.ok) window.location.reload();
@@ -119,7 +119,7 @@ async function deleteReview(id) {
     try {
         const res = await fetch(`/api/admin/reviews/${id}`, {
             method: 'DELETE',
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...(token ? { Authorization: 'Bearer ' + token } : {}) }
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) }
         });
         if (res.ok) window.location.reload();
         else { const e = await res.json(); alert(e.message || 'Failed'); }

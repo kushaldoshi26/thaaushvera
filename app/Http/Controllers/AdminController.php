@@ -14,16 +14,7 @@ class AdminController extends Controller
 {
     use RecordsLoginHistory;
 
-    /**
-     * Show the admin login page
-     */
-    public function showLogin()
-    {
-        if (Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'super_admin')) {
-            return redirect(url('/admin'));
-        }
-        return view('admin.login');
-    }
+
 
     /**
      * Handle admin login form submission

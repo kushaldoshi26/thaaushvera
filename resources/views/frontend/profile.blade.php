@@ -766,6 +766,14 @@
         const token = localStorage.getItem('auth_token');
         const user = localStorage.getItem('currentUser');
         
+        // Clear session_auth if the server session is guest (logged out)
+        if (token === 'session_auth' && @json(!Auth::check())) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        }
+        
         // If token exists but no user data, clear everything
         if (token && !user) {
             localStorage.removeItem('auth_token');

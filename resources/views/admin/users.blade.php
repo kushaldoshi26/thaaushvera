@@ -93,7 +93,7 @@ function deleteUser(id, name) {
     const token = localStorage.getItem('auth_token');
     fetch(`/api/admin/users/${id}`, {
         method: 'DELETE',
-        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...(token ? { Authorization: 'Bearer ' + token } : {}) }
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) }
     }).then(res => res.ok ? window.location.reload() : res.json().then(e => alert(e.message || 'Failed')))
       .catch(() => alert('Network error'));
 }

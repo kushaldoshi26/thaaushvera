@@ -200,6 +200,26 @@
 </style>
 
 <script>
+    // Intercept global fetch to prevent sending 'Bearer session_auth'
+    const originalFetch = window.fetch;
+    window.fetch = function (input, init) {
+        if (init && init.headers) {
+            if (init.headers instanceof Headers) {
+                if (init.headers.get('Authorization') === 'Bearer session_auth') {
+                    init.headers.delete('Authorization');
+                }
+            } else if (typeof init.headers === 'object') {
+                if (init.headers['Authorization'] === 'Bearer session_auth') {
+                    delete init.headers['Authorization'];
+                }
+                if (init.headers['authorization'] === 'Bearer session_auth') {
+                    delete init.headers['authorization'];
+                }
+            }
+        }
+        return originalFetch.apply(this, arguments);
+    };
+
     // Inject session token into localStorage so API calls work after web login
     @if(session('admin_token'))
     localStorage.setItem('auth_token', '{{ session("admin_token") }}');

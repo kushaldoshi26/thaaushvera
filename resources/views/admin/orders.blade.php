@@ -115,7 +115,7 @@ async function updateOrderStatus(id, status) {
         const token = localStorage.getItem('auth_token');
         const res = await fetch(`/api/admin/orders/${id}/status`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) },
             body: JSON.stringify({ status })
         });
         const data = await res.json();

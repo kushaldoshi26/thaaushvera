@@ -236,7 +236,7 @@ async function saveProduct(e) {
         const token = localStorage.getItem('auth_token');
         const res = await fetch(url, {
             method,
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) },
             body: formData
         });
         if (res.ok) {
@@ -266,7 +266,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async () =
         const token = localStorage.getItem('auth_token');
         const res = await fetch(`/api/admin/products/${deleteTarget}`, {
             method: 'DELETE',
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...(token ? { Authorization: 'Bearer ' + token } : {}) }
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, ...((token && token !== 'session_auth') ? { Authorization: 'Bearer ' + token } : {}) }
         });
         if (res.ok) { closeDelete(); window.location.reload(); }
         else { const e = await res.json(); alert(e.message || 'Failed to delete'); }

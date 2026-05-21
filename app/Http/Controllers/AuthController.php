@@ -61,6 +61,10 @@ class AuthController extends Controller
             try {
                 \Illuminate\Support\Facades\Auth::login($user, true);
                 session(['admin_token' => $token]);
+                
+                // Update last login and record login history
+                $user->update(['last_login_at' => now()]);
+                $this->recordLoginHistory($user->id, 'api');
             } catch (\Exception $sessionEx) {
                 \Illuminate\Support\Facades\Log::warning('Session login during register failed: ' . $sessionEx->getMessage());
             }

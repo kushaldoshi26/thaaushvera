@@ -28,6 +28,7 @@ var api = {
         const fetchOptions = {
             method: options.method || 'GET',
             headers: headers,
+            credentials: 'same-origin'
         };
 
         // Handle body — if it's already a string (JSON.stringify was called), use as-is
